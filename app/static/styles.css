@@ -1,0 +1,137 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans&family=Work+Sans:wght@300&display=swap");
+html {
+  font-size: 10pt;
+  font-family: "Noto Sans", sans-serif;
+  background-color: #090938;
+  color: #c9c4db;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Work Sans", sans-serif;
+}
+
+#contact-form {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  grid-template-rows: 1fr 1fr 4fr 1fr;
+  gap: 20px;
+}
+
+#form-label-name {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+#form-field-name {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+#form-label-email {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+#form-field-email {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+#form-label-message {
+  grid-column: 1;
+  grid-row: 3;
+}
+
+#form-field-message {
+  grid-column: 2;
+  grid-row: 3;
+}
+
+#form-submit {
+  grid-column: 1/3;
+  grid-row: 4;
+}
+
+#contact-form .title-text {
+  font-size: 3rem;
+  text-align: center;
+}
+
+#contact-form .form-field {
+  background-color: #090938;
+  color: #c9c4db;
+  font-family: "Noto Sans", sans-serif;
+  font-size: 1.5rem;
+}
+
+#contact-form .form-submit-button {
+  border: 1px solid #e0e046;
+  width: 100px;
+  height: 50px;
+  background-color: #090938;
+  color: #c9c4db;
+  border-radius: 10px 10px;
+}
+
+#contact-form {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr;
+  gap: 20px;
+}
+
+#form-label-email {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+#form-field-email {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+#form-label-firstname {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+#form-field-firstname {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+#form-label-lastname {
+  grid-column: 1;
+  grid-row: 3;
+}
+
+#form-field-lastname {
+  grid-column: 2;
+  grid-row: 3;
+}
+
+#form-submit {
+  grid-column: 1/3;
+  grid-row: 4;
+}
+
+#contact-form .title-text {
+  font-size: 3rem;
+  text-align: center;
+}
+
+#contact-form .form-field {
+  background-color: #090938;
+  color: #c9c4db;
+  font-family: "Noto Sans", sans-serif;
+  font-size: 1.5rem;
+}
+
+#contact-form .form-submit-button {
+  border: 1px solid #e0e046;
+  width: 100px;
+  height: 50px;
+  background-color: #090938;
+  color: #c9c4db;
+  border-radius: 10px 10px;
+}

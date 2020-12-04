@@ -1,0 +1,15 @@
+@import "sass_partials/variables";
+
+// typography
+html {
+  font-size: 10pt;
+  font-family: $body-font;
+  background-color: $background-color;
+  color: $foreground-color;
+}
+h1, h2, h3, h4, h5, h6 {
+  font-family: $header-font;
+}
+
+@import "sass_partials/contactForm";
+@import "sass_partials/newsletterForm";

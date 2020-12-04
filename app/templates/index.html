@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<body>
+  <h1>Flask Base App</h1>
+  <main>
+    <p>Hi, welcome to Flask Base.</p>
+    <p><a href="{{ url_for('main.contact') }}">Contact form can be found here.</a></p>
+    <p><a href="{{ url_for('main.newsletter_signup') }}">Newsletter signup here</a></p>
+    <p>Other things will be found here in the future as well. Thanks for visiting!</p>
+    <p><a href="www.joshuastauffer.com" target="_blank">Built by Joshua Stauffer</a></p>
+  </main>
+</body>
+{% endblock %}

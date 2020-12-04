@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<head>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Flask Base</title>
+<link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet">
+</head>
+
+<body>
+  {% block body %}
+  {% endblock %}
+</body>

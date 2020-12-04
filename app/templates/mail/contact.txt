@@ -1,0 +1,5 @@
+New message from {{ name }}
+------------------------------------------------------
+{{ message_text }}
+------------------------------------------------------
+Reply to this email to respond to the sender.

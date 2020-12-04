@@ -1,0 +1,9 @@
+<p>Dear {% if user.first_name %}{{user.first_name}}{% else %}{{ user.last_name }}{% endif %},</p>
+
+<p>Welcome to this website</p>
+
+<p>Please confirm your account by clicking on the following link:</p>
+{{ url_for('auth.confirm', token=token, _external=True) }}
+
+<p>Sincerely,</p>
+<p>Website Admin</p>

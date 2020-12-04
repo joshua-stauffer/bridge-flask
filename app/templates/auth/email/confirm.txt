@@ -1,0 +1,10 @@
+Dear {% if user.first_name %}{{user.first_name}}{% else %}{{ user.last_name }}{% endif %},
+
+Welcome to The History Atlas!
+
+To confirm your account and unlock editing priviledges, please confirm your account by clicking on the following link:
+{{ url_for('auth.confirm', token=token, _external=True) }}
+
+Sincerely,
+
+Joshua

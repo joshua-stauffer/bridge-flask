@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+<!--Requires: 
+  form action
+  u value
+  ui value
+  ht value
+-->
+
+{% block body %}
+  <h1>Hi, here is a contact form</h1>
+  <section>
+    <form method="POST" action="" id="contact-form">
+      <input type="hidden" name="u" value="">
+      <input type="hidden" name="id" value="">
+      <label for="MERGE0">Email:</label>
+        <input type="email" name="MERGE0" required>
+      <label for="MERGE1">First Name</label>
+        <input type="text" name="MERGE1" required>
+      <label for="MERGE2">Last Name</label>
+        <input type="text" name="MERGE2" required>
+        <input type="submit" name="submit" value="Subscribe">
+      <input type="hidden" name="ht" value="">
+      <input type="hidden" name="mc_signupsource" value="hosted">
+    </form>
+  </section>
+{% endblock %}
