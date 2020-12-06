@@ -1,0 +1,14 @@
+/* mobile layout */
+.main-wrapper {
+    display: grid;
+    grid-template-areas:
+      "banner"
+      "navbar"
+      "main"
+      "sidebar"
+      "footer";
+  }
+  nav a:active {
+    background-color: $primary-color;
+    color: $background-color;
+  }

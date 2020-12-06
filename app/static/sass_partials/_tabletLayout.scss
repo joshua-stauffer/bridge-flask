@@ -1,0 +1,37 @@
+// tablet layout
+@media (min-width: 600px){
+  .main-wrapper {
+      grid-template-areas: 
+      "banner banner"
+      "navbar navbar"
+      "main sidebar"
+      "footer footer";
+      grid-template-columns: 1fr 250px;
+      grid-gap: 20px;
+  }
+  nav ul {
+      flex-direction: row;
+      margin: 0;
+  }
+  nav {
+      border: none;
+      border-top: $primary-color 1px solid;
+      border-bottom: $primary-color 1px solid;
+  }
+  nav a {
+      height: 100%;
+      line-height: 4rem;
+  }
+  aside {
+      border-left: $background-color 1px solid;
+  }
+
+  // typography
+  h1 {
+    font-size: calc(1.4rem + 4.5vw);
+  }
+  h3 {
+    font-size: 3rem;
+  }
+}
+  

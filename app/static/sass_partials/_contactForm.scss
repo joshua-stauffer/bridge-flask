@@ -50,3 +50,36 @@
   color: $foreground-color;
   border-radius: 10px 10px;
 }
+
+
+/*
+aside form {
+  display: block;
+}
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: 100%;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+.form-label {
+  display: block;
+  line-height: 2em;
+}
+input:active {
+  background-color: $primary-color;
+  color: $background-color;
+}
+.submit-button {
+  border-radius: 10px 10px;
+}
+submit-button:hover {
+  background-color: $primary-color;
+  color: $background-color;
+}
+submit-button:focus {
+  border: 1px $primary-color dotted;
+}
+*/

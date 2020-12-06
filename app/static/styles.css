@@ -1,137 +1,235 @@
-@import url("https://fonts.googleapis.com/css2?family=Noto+Sans&family=Work+Sans:wght@300&display=swap");
+/* primary color: brunswick green */
+/* accent-similar-light: mint */
+/* accent-similar-dark: Amazon */
+/* accent-contrast-light: Dark Blue Gray */
+/* accent-contrast-dark: space cadet */
+/* typography */
 html {
-  font-size: 10pt;
-  font-family: "Noto Sans", sans-serif;
-  background-color: #090938;
-  color: #c9c4db;
+  font-size: 10px;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: "Work Sans", sans-serif;
+h1, h3 {
+  font-family: "Raleway", sans-serif, serif;
+  color: #385749ff;
 }
 
-#contact-form {
-  display: grid;
-  grid-template-columns: 1fr 3fr;
-  grid-template-rows: 1fr 1fr 4fr 1fr;
-  gap: 20px;
+p, blockquote, a {
+  font-family: "Quicksand", sans-serif;
 }
 
-#form-label-name {
-  grid-column: 1;
-  grid-row: 1;
-}
-
-#form-field-name {
-  grid-column: 2;
-  grid-row: 1;
-}
-
-#form-label-email {
-  grid-column: 1;
-  grid-row: 2;
-}
-
-#form-field-email {
-  grid-column: 2;
-  grid-row: 2;
-}
-
-#form-label-message {
-  grid-column: 1;
-  grid-row: 3;
-}
-
-#form-field-message {
-  grid-column: 2;
-  grid-row: 3;
-}
-
-#form-submit {
-  grid-column: 1/3;
-  grid-row: 4;
-}
-
-#contact-form .title-text {
+h1 {
   font-size: 3rem;
+  margin: 0;
+}
+
+h2 {
+  font-family: "Quicksand", sans-serif, sans-serif;
+  font-size: 1.8rem;
+  word-spacing: 2%;
+}
+
+h3 {
+  font-size: 2rem;
+  margin: 0;
+}
+
+p, a {
+  font-size: 1.6rem;
+}
+
+blockquote {
+  font-family: "Raleway", sans-serif;
+  font-style: italic;
+  line-height: 2em;
+  font-size: 1.8rem;
+}
+
+.quote-author {
+  display: inline-block;
+  font-style: normal;
+}
+
+p {
+  line-height: 2em;
+}
+
+.italic {
+  font-style: italic;
+}
+
+/* basic layout */
+body {
+  width: 90%;
+  max-width: 1200px;
+  padding: 2.5%;
+  background-color: #ffffffff;
+}
+
+/* grid area settings */
+header {
+  -ms-grid-row: 1;
+  -ms-grid-column: 1;
+  grid-area: banner;
+}
+
+nav {
+  -ms-grid-row: 2;
+  -ms-grid-column: 1;
+  grid-area: navbar;
+}
+
+main {
+  -ms-grid-row: 3;
+  -ms-grid-column: 1;
+  grid-area: main;
+}
+
+aside {
+  -ms-grid-row: 4;
+  -ms-grid-column: 1;
+  grid-area: sidebar;
+}
+
+footer {
+  -ms-grid-row: 5;
+  -ms-grid-column: 1;
+  grid-area: footer;
+}
+
+/* mobile layout */
+.main-wrapper {
+  display: -ms-grid;
+  display: grid;
+      grid-template-areas: "banner" "navbar" "main" "sidebar" "footer";
+}
+
+nav a:active {
+  background-color: #385749ff;
+  color: #ffffffff;
+}
+
+@media (min-width: 600px) {
+  .main-wrapper {
+        grid-template-areas: "banner banner" "navbar navbar" "main sidebar" "footer footer";
+    -ms-grid-columns: 1fr 250px;
+        grid-template-columns: 1fr 250px;
+    grid-gap: 20px;
+  }
+  nav ul {
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: row;
+            flex-direction: row;
+    margin: 0;
+  }
+  nav {
+    border: none;
+    border-top: #385749ff 1px solid;
+    border-bottom: #385749ff 1px solid;
+  }
+  nav a {
+    height: 100%;
+    line-height: 4rem;
+  }
+  aside {
+    border-left: #ffffffff 1px solid;
+  }
+  h1 {
+    font-size: calc(1.4rem + 4.5vw);
+  }
+  h3 {
+    font-size: 3rem;
+  }
+}
+
+@media (min-width: 945px) {
+  .main-wrapper {
+        grid-template-areas: "banner banner banner" "navbar main sidebar" "footer footer footer";
+    -ms-grid-columns: 1fr 3fr 300px;
+        grid-template-columns: 1fr 3fr 300px;
+  }
+  nav ul {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+    height: 400px;
+  }
+  nav {
+    border: none;
+    border-right: #385749ff 1px solid;
+  }
+  h1 {
+    font-size: calc(1.4rem + 4.5vw);
+  }
+}
+
+header img {
+  width: 20%;
+  float: right;
+  margin-right: 5%;
+}
+
+header h1 {
+  text-align: left;
+}
+
+header h2 {
+  text-align: left;
+}
+
+/* navbar style */
+nav {
+  border: none;
+}
+
+nav ul {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  padding: 0;
+}
+
+nav li {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  -ms-flex-positive: 1;
+      flex-grow: 1;
+  list-style: none;
+}
+
+nav a {
+  display: inline-block;
+  width: 100%;
+  line-height: 3rem;
+  text-align: center;
+  text-decoration: none;
+  color: #385749ff;
+}
+
+nav a:hover {
+  background-color: #385749ff;
+  color: #ffffffff;
+}
+
+/* main section style */
+main iframe {
+  -o-object-fit: fill;
+     object-fit: fill;
+}
+
+/* aside style */
+aside {
+  border: none;
+}
+
+/* footer style */
+footer p {
   text-align: center;
 }
-
-#contact-form .form-field {
-  background-color: #090938;
-  color: #c9c4db;
-  font-family: "Noto Sans", sans-serif;
-  font-size: 1.5rem;
-}
-
-#contact-form .form-submit-button {
-  border: 1px solid #e0e046;
-  width: 100px;
-  height: 50px;
-  background-color: #090938;
-  color: #c9c4db;
-  border-radius: 10px 10px;
-}
-
-#contact-form {
-  display: grid;
-  grid-template-columns: 1fr 3fr;
-  grid-template-rows: 1fr 1fr 1fr 1fr;
-  gap: 20px;
-}
-
-#form-label-email {
-  grid-column: 1;
-  grid-row: 1;
-}
-
-#form-field-email {
-  grid-column: 2;
-  grid-row: 1;
-}
-
-#form-label-firstname {
-  grid-column: 1;
-  grid-row: 2;
-}
-
-#form-field-firstname {
-  grid-column: 2;
-  grid-row: 2;
-}
-
-#form-label-lastname {
-  grid-column: 1;
-  grid-row: 3;
-}
-
-#form-field-lastname {
-  grid-column: 2;
-  grid-row: 3;
-}
-
-#form-submit {
-  grid-column: 1/3;
-  grid-row: 4;
-}
-
-#contact-form .title-text {
-  font-size: 3rem;
-  text-align: center;
-}
-
-#contact-form .form-field {
-  background-color: #090938;
-  color: #c9c4db;
-  font-family: "Noto Sans", sans-serif;
-  font-size: 1.5rem;
-}
-
-#contact-form .form-submit-button {
-  border: 1px solid #e0e046;
-  width: 100px;
-  height: 50px;
-  background-color: #090938;
-  color: #c9c4db;
-  border-radius: 10px 10px;
-}
+/*# sourceMappingURL=styles.css.map */

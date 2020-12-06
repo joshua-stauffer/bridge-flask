@@ -1,0 +1,25 @@
+// desktop layout
+@media (min-width: 945px){
+    .main-wrapper {
+      grid-template-areas:
+      "banner banner banner"
+      "navbar main sidebar"
+      "footer footer footer";
+      grid-template-columns: 1fr 3fr 300px;
+    }
+    nav ul {
+      flex-direction: column;
+      height: 400px;
+    }
+    nav {
+      border: none;
+      border-right: $primary-color 1px solid;
+    }
+    nav li {
+    }
+
+    // typography
+    h1 {
+        font-size: calc(1.4rem + 4.5vw);
+    }
+}

@@ -1,9 +1,12 @@
 // colors
-$background-color: rgb(9, 9, 56);
-$foreground-color: rgb(201, 196, 219);
-$accent-color: rgb(224, 224, 70);
+$primary-color: #385749ff;  /* primary color: brunswick green */
+$accent-similar-light: #43b182ff; /* accent-similar-light: mint */
+$accent-similar-dark: #3B7D60; /* accent-similar-dark: Amazon */
+$accent-contrast-light: #6E62A7; /* accent-contrast-light: Dark Blue Gray */
+$accent-contrast-dark: #342c63ff; /* accent-contrast-dark: space cadet */
+$background-color: #ffffffff; // background-color: white
 
 // fonts
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans&family=Work+Sans:wght@300&display=swap');
-$header-font: 'Work Sans', sans-serif;
-$body-font: 'Noto Sans', sans-serif;
+$header-font: 'Crimson Text', serif;
+$header-font: 'Raleway', sans-serif;
+$body-font: 'Quicksand', sans-serif;

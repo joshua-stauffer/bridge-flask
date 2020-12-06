@@ -1,11 +1,21 @@
 <!DOCTYPE html>
-<head>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Flask Base</title>
-<link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet">
-</head>
+<html>
+  <head>
+    <title>The Bridge Between</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital@0;1&family=Quicksand&display=swap" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300&display=swap" rel="stylesheet"> 
+  </head>
 
 <body>
-  {% block body %}
-  {% endblock %}
+  <div class="main-wrapper">
+    {% include 'header.html' %}
+    {% include 'navbar.html' %}
+    {% block body %}
+    {% endblock %}
+    {% include 'sidebar.html' %}
+    {% include 'footer.html' %}
+  </div>
+  <script type="module" src="{{ url_for('static', filename='main.js') }}"></script>
 </body>

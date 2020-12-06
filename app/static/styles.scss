@@ -1,15 +1,15 @@
 @import "sass_partials/variables";
-
-// typography
-html {
-  font-size: 10pt;
-  font-family: $body-font;
-  background-color: $background-color;
-  color: $foreground-color;
-}
-h1, h2, h3, h4, h5, h6 {
-  font-family: $header-font;
-}
-
+@import "sass_partials/typography";
+@import "sass_partials/basicLayout";
+@import "sass_partials/mobileLayout";
+@import "sass_partials/tabletLayout";
+@import "sass_partials/desktopLayout";
+@import "sass_partials/header";
+@import "sass_partials/mainNav";
+@import "sass_partials/mainBody";
+@import "sass_partials/aside";
 @import "sass_partials/contactForm";
-@import "sass_partials/newsletterForm";
+@import "sass_partials/footer";
+
+// @import "sass_partials/contactForm";
+// @import "sass_partials/newsletterForm";

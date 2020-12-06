@@ -14,6 +14,27 @@ bp = Blueprint('main', __name__)
 def index():
     return render_template('index.html')
 
+
+@bp.route('/visual-thesaurus')
+def visual_thesaurus():
+    return redirect('http://localhost:3000/')
+
+
+@bp.route('/blog')
+def blog():
+    pass
+
+
+@bp.route('/videos')
+def videos():
+    pass
+
+
+@bp.route('/about')
+def about():
+    pass
+
+
 @bp.route('/contact', methods=['GET', 'POST'])
 def contact():
     form = forms.ContactForm()

@@ -7,6 +7,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from . import db
 from . import login_manager
+from .utils.to_json import node_to_json
 
 
 # relationship goes in parent
@@ -65,6 +66,14 @@ class Quote(db.Model):
 
     def __repr__(self):
         return f'"{self.text}" \n-{self.author}'
+
+    # API access point
+    @staticmethod
+    def to_dict_list():
+        return [
+            {'author': q.author, 'text': q.text}
+            for q in Quote.query.all()
+        ]
 
 
 class Post(db.Model):
@@ -161,6 +170,13 @@ class Node(db.Model):
 
     def __repr__(self):
         return f'{self.title}\nSynonyms: {self.synonyms}\nAntonyms: {self.antonyms}'
+
+    # API access point
+    @staticmethod
+    def to_dict():
+        """Returns a dictionary of all available Node data."""
+        data = Node.query.all()
+        return {d.title: node_to_json(d) for d in data}
 
 
 # user loader function

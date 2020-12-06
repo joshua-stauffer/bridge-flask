@@ -1,0 +1,14 @@
+/* basic layout */
+body {
+    width: 90%;
+    max-width: 1200px;
+    padding: 2.5%;
+    background-color: $background-color;
+  }
+  
+  /* grid area settings */
+  header {grid-area: banner;}
+  nav {grid-area: navbar;}
+  main {grid-area: main;}
+  aside {grid-area: sidebar;}
+  footer {grid-area: footer;}

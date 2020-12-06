@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 
 {% block body %}
-  <h1>Hi, here is a contact form</h1>
-  <section>
+  
+  <main>
+    <h3>Hi, here is a contact form</h3>
     <form method="POST" id="contact-form">
       {{ form.hidden_tag() }}
       {{ form.name.label(class='form-label', id='contact-form-label-name') }} {{ form.name(class='form-field', id='contact-form-field-name') }}
@@ -10,5 +11,5 @@
       {{ form.message.label(class='form-label', id='contact-form-label-message') }} {{ form.message(class='form-field', id='contact-form-field-message') }}
       {{ form.submit(class='form-submit-button', class='form-label', id='contact-form-submit') }}
     </form>
-  </section>
+  </main>
 {% endblock %}

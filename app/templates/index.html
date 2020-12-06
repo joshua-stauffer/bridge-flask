@@ -1,14 +1,11 @@
 {% extends 'base.html' %}
 
 {% block body %}
-<body>
-  <h1>Flask Base App</h1>
   <main>
-    <p>Hi, welcome to Flask Base.</p>
-    <p><a href="{{ url_for('main.contact') }}">Contact form can be found here.</a></p>
-    <p><a href="{{ url_for('main.newsletter_signup') }}">Newsletter signup here</a></p>
-    <p>Other things will be found here in the future as well. Thanks for visiting!</p>
-    <p><a href="www.joshuastauffer.com" target="_blank">Built by Joshua Stauffer</a></p>
+    <h3>About the Film</h3>
+    <p>The Bridge Between explores the heart of Contextual Theory through the life of its founder Ivan Boszormenyi-Nagy. Featuring photos and narrative of familial, cultural, professional, and international forces that shaped Nagy and his thinking, the video demonstrates how Contextual Therapy was a unique contribution to the emerging field of marriage and family therapy. Clips from a therapy session with a four generational family show Nagy’s skill at searching for “What is on the other side?” and finding merit in every person. The film highlights the interconnectedness of our lives and the trust building potential when members of a family are free to give and receive care. Subtitles available in English, Spanish, Dutch and Hungarian.</p>
+    <div class="video">
+      <iframe title="Youtube video for the film The Bridge Between" width="100%" height="315" src="https://www.youtube.com/embed/KhfzKnZDQ6s" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
   </main>
-</body>
 {% endblock %}

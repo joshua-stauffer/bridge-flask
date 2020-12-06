@@ -1,0 +1,44 @@
+/* typography */
+html {
+  font-size: 10px;
+}
+h1, h3 {
+  font-family: $header-font, serif;
+  color: $primary-color;
+}
+p, blockquote, a {
+  font-family: $body-font;
+}
+h1 {
+  font-size: 3rem;
+  margin: 0;
+}
+h2 {
+  font-family: $body-font, sans-serif;
+  font-size: 1.8rem;
+  word-spacing: 2%;
+}
+h3 {
+  font-size: 2rem;
+  margin: 0;
+}
+
+p, a {
+  font-size: 1.6rem;
+}
+blockquote {
+  font-family: $header-font;
+  font-style: italic;
+  line-height: 2em;
+  font-size: 1.8rem;
+}
+.quote-author {
+  display: inline-block;
+  font-style: normal;
+}
+p {
+  line-height: 2em;
+}
+.italic {
+  font-style: italic;
+}
