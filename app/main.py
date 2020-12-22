@@ -27,7 +27,7 @@ def blog():
 
 @bp.route('/videos')
 def videos():
-    pass
+    return render_template('video.html')
 
 
 @bp.route('/about')

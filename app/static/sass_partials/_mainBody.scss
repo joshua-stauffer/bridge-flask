@@ -1,4 +1,24 @@
 /* main section style */
+main .video {
+  position: relative;
+  padding-bottom: 56.25%;
+}
 main iframe {
-    object-fit: fill;
+  position: absolute;
+  top: 0;
+  left: 0;  object-fit: fill;
   }
+
+// front page flex boxes
+main .box-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+main .box {
+  width: 200px;
+  height: 200px;
+  margin: 5%;
+  flex-grow: 1;
+  border: solid 1px green;
+}

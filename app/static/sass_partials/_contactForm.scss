@@ -38,16 +38,16 @@
 }
 #contact-form .form-field {
   background-color: $background-color;
-  color: $foreground-color;
+  color: $primary-color;
   font-family: $body-font;
   font-size: 1.5rem;
 }
 #contact-form .form-submit-button {
-  border: 1px solid $accent-color;
+  border: 1px solid $accent-similar-light;
   width: 100px;
   height: 50px;
   background-color: $background-color;
-  color: $foreground-color;
+  color: $primary-color;
   border-radius: 10px 10px;
 }
 
