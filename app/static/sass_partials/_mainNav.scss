@@ -1,11 +1,16 @@
 /* navbar style */
 nav {
-  border: none;
+  margin-top: 30px;
+  margin-bottom: 30px;
+  border-top: solid 2px $primary-color;
+  border-bottom: solid 2px $primary-color;
 }
 nav ul {
   display: flex;
   flex-direction: row;
   padding: 0;
+  margin: 0;
+  height: auto;
 }
 nav li {
   flex: 1;
@@ -15,12 +20,25 @@ nav li {
 nav a {
   display: inline-block;
   width: 100%;
-  line-height: 3rem;
+  height: 100%;
+  line-height: 4rem;
   text-align: center;
   text-decoration: none;
   color: $primary-color;
+  text-transform: uppercase;
+  letter-spacing: 0.2rem;
 }
-nav a:hover {
+nav li:hover {
   background-color: $primary-color;
-  color: $background-color;
+  a {
+    color: $background-color;
+  }
+}
+
+// which page are we on?
+nav .active {
+  background-color: $primary-color;
+  a {
+    color: $background-color;
+  }
 }

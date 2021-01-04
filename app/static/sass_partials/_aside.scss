@@ -1,4 +1,21 @@
 /* aside style */
 aside {
-    border: none;
+    height: 100%;
+
+    border-left: solid 1px $primary-color;
 }
+blockquote {
+    font-family: $quote-font;
+    font-style: italic;
+    line-height: 2em;
+    font-size: 1.4rem;
+    margin-left: 20px;
+    margin-right: 0;
+    margin-top: 0;
+    letter-spacing: 0.1rem;
+    word-spacing: 0.1rem;
+  }
+  .quote-author {
+    display: inline-block;
+    font-style: normal;
+  }

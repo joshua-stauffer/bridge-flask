@@ -1,20 +1,16 @@
 // desktop layout
-@media (min-width: 945px){
+@media (min-width: $breakpoint){
   .main-wrapper {
     grid-template-areas:
     "banner banner"
     "navbar navbar"
     "main sidebar"
     "footer footer";
-    grid-template-columns: 3fr 1fr;
-    grid-template-rows: auto auto 600px;
+    grid-template-columns: 3.2fr .8fr;
   }
 
 
 
-  // typography
-  h1 {
-      font-size: calc(1.4rem + 4.5vw);
-  }
+
 }
 

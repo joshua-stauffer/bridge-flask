@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block body %}
+  <main>
+    <article>
+      <h2 class="main-header">About the Author</h2>
+      <img class="inline-image" alt='photo of woman' src="{{ url_for('static', filename='images/janet.jpg') }}" style="float: right;">
+      <p>
+        Janet Stauffer is a Contextual Therapist, professor, and scholar.
+        She was introduced to Contextual Theory and Buber’s I Thou (dialogue) early in her career and was immediately drawn to this resource based therapy. 
+        Its healing potential emerges as persons turn and face one another in ways that build trust and provide a healthy legacy for future generations.
+      </p>
+      <p>
+        <blockquote>“We are deeply interconnected at existential levels. When we honor one another in our shared existence, we grow into who we are as persons.”</blockquote>
+      </p>
+      <p>
+        Janet is a licensed marriage and family therapist in the state of Pennsylvania, an American Association of Marriage & Family Therapy Fellow and certified Clinical Supervisor. 
+        She is a professor in the Graduate School of Marriage & Family Therapy at Evangelical Seminary and maintains a private therapy practice.
+      </p>
+      <p>
+        Her mentors in Contextual training included Dr. Barbara Krasner, Dr. Maurice Friedman, and Dr. Douglas Schoeninger. She has presented internationally and locally as well as published in MFT journals. 
+        Janet enjoyed connecting with Contextual colleagues around the world in the process of developing the video: The Bridge Between: Ivan Boszormenyi-Nagy and Contextual Therapy.
+      </p>
+      <p>
+        Among her many interests, Janet can be found volunteering in her community or canoeing among lily pads in gentle streams with Jim, her beloved dialogue partner.
+      </p>
+      <p>
+        <blockquote>“I am indebted to each one who walks the journey of dialogue with me.”</blockquote>
+      </p>
+
+    </article>
+  </main>
+{% endblock %}

@@ -1,6 +1,6 @@
 import os
 from app import create_app, db
-from app.models import User, Post, Quote, Node
+from app.models import User, Post, PostContents, Quote, Node, Video, Resource
 
 from dotenv import load_dotenv
 
@@ -24,5 +24,6 @@ def test():
 @app.shell_context_processor
 def make_shell_context():
     return dict(
-        db=db, Node=Node, Post=Post, User=User, Quote=Quote
+        db=db, Node=Node, Post=Post, PostContents=PostContents,
+        User=User, Quote=Quote, Video=Video, Resource=Resource
     )

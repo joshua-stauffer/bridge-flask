@@ -3,13 +3,15 @@
 {% block body %}
   
   <main>
-    <h3>Hi, here is a contact form</h3>
+    <h2 class="main-header centered">Get in touch</h2>
     <form method="POST" id="contact-form">
       {{ form.hidden_tag() }}
       {{ form.name.label(class='form-label', id='contact-form-label-name') }} {{ form.name(class='form-field', id='contact-form-field-name') }}
       {{ form.email.label(class='form-label', id='contact-form-label-email') }} {{ form.email(class='form-field', id='contact-form-field-email') }}
       {{ form.message.label(class='form-label', id='contact-form-label-message') }} {{ form.message(class='form-field', id='contact-form-field-message') }}
-      {{ form.submit(class='form-submit-button', class='form-label', id='contact-form-submit') }}
+      <div class="center-container">
+        {{ form.submit(class='form-submit-button', class='form-label', id='contact-form-submit') }}
+      </div>
     </form>
   </main>
 {% endblock %}

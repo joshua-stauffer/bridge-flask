@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block body %}
+  <main>
+    <article class="blog-post">
+      <h2 class="main-header">{{ post_metadata['title'] }}</h2>
+
+      {% if post_metadata['subtitle'] %}
+        <h3 class="main-subheader">{{ post_metadata['subtitle'] }}</h3>
+      {% endif %}
+
+      <div class="details-container">
+        <h4 class="item-details">{{ post_metadata['author'] }}</h4>
+        {% if post_metadata['updated'] %}
+          <h4 class="item-details">Updated: {{ post_metadata['updated'] }}</h4>
+        {% endif %}
+        <h4 class="item-details">Published: {{ post_metadata['pub_date'] }}</h4>
+      </div>
+
+      {% for content in post_content %}
+        {% if content['type'] == 'p'%}
+          <p class="item-text" style="{{ content['css'] }}">{{ content['payload'] }}</p>
+        {% elif content['type'] == 'title' %}
+          <h2 class="item-title" style="{{ content['css'] }}">{{ content['payload'] }}</h2>
+        {% elif content['type'] == 'video' %}
+          <div class="video-container" style="{{ content['css'] }}">
+            <iframe alt="{{ content['payload'] }}" width="100%" height="100%" src="{{ content['uri'] }}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          </div>
+        {% elif content['type'] == 'img' %}
+          <img class="inline-image" alt="{{ content['payload'] }}" src="{{ content['uri'] }}" style="{{ content['css'] }}">
+        {% else %}
+          <h1> ERROR!!! BLOG TEMPLATE PASSED UNKNOWN OBJECT: </h1>
+          <ul>
+            {% for k, v in post_content.items() %}
+              <li>{{ k }} : {{ v }}</li>
+            {% endfor %}
+        {% endif %}
+      {% endfor %}
+
+      <hr>
+      
+      <ul class="blog-controls">
+          <li class="blog-control-item">
+            {% if prev_post_id %}
+              <p><a href="{{ url_for('main.blog', post_id=prev_post_id) }}">
+                Previous Post
+              </a></p>
+            {% else %}
+              <p>No Earlier Posts</p>
+            {% endif %}
+          </li>
+
+        <li class="blog-control-item">
+            {% if next_post_id %}
+              <p><a href="{{ url_for('main.blog', post_id=next_post_id) }}">
+                Next Post
+              </a></p>
+            {% else %}
+              <p>No Newer Posts</p>
+            {% endif %}
+          </li>
+
+      </ul>
+
+      <div class="blog-controls">
+          <p><a href="{{ url_for('main.blog_index') }}">All Blog Posts</a></p>
+      </div>
+    </article>
+  </main>
+{% endblock %}

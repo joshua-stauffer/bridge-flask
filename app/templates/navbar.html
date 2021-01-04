@@ -1,19 +1,32 @@
 <nav>
     <ul class="navbar-list">
-      <li>
-        <a href="#1">Watch the Film </a>
+      <li {% if page == 'home' %}class="active"{% endif %}>
+        <a href="{{ url_for('main.index') }}">Home</a>
       </li>
-      <li>          
-        <a href="{{ url_for('main.visual_thesaurus') }}">Visual Thesaurus </a>
+
+      <li {% if page == 'videos' %}class="active"{% endif %}>
+        <a href="{{ url_for('main.videos') }}">Videos</a>
       </li>
-      <li>
-        <a href="#3">Blog </a>
+
+      <li {% if page == '' %}class="active"{% endif %}>          
+        <a href="{{ url_for('main.visual_thesaurus') }}">Thesaurus </a>
       </li>
-      <li>          
-        <a href="#4">About the Author </a>
+
+      <li {% if page == 'blog' %}class="active"{% endif %}>
+        <a href="{{ url_for('main.blog', post_id=0)  }}">Blog </a>
       </li>
-      <li>          
+
+      <li {% if page == 'resources' %}class="active"{% endif %}>          
+        <a href="{{ url_for('main.resources') }}">Resources</a>
+      </li>
+
+      <li {% if page == 'about' %}class="active"{% endif %}>
+        <a href="{{ url_for('main.about') }}">About</a>
+      </li>
+
+      <li {% if page == 'contact' %}class="active"{% endif %}>          
         <a href="{{ url_for('main.contact') }}">Contact </a>
       </li>
+      
     </ul>
   </nav>

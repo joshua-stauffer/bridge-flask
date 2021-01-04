@@ -2,15 +2,43 @@
 
 {% block body %}
   <main>
-    <h3>Here I am. I walk to you. Will you meet me?</h3>
+    <h2 class="main-header">Here I am. I walk to you. Will you meet me?</h2>
     <p>Healing dialogue is a way to see, to know, myself and the other. It explores resources, unearths possibilities, builds trust,
       repairs injuries, releases guilt, creates a legacy between persons. In dialogue, a voice is found, a voice is heard, a person is formed. 
       Learn, be inspirited, carve new relational pathways, live with vitality.</p>
     <div class="box-wrapper">
-      <div class="box"></div>
-      <div class="box"></div>
-      <div class="box"></div>
-      <div class="box"></div>
+      <a class="box-link" href="{{ url_for('main.videos') }}">
+        <div class="box" id="index-video-box">
+          <h3 class="box-title">Videos</h3>
+          <div class="image-box">
+            <img width="800" height="450" src="{{ url_for('static', filename='images/wide-angle-bridge-between-video-cover.jpg') }}" alt="bridge over water"> 
+          </div>
+        </div>
+      </a>
+      <a class="box-link" href="{{ url_for('main.visual_thesaurus') }}">
+        <div class="box" id="index-vt-box">
+          <h3 class="box-title">Visual Thesaurus</h3> 
+          <div class="image-box">
+            <img width="800" height="450" src="{{ url_for('static', filename='images/wide-angle-visual-thesaurus.png') }}" alt="visual thesaurus"> 
+          </div>
+        </div>
+      </a>
+      <a class="box-link" href="{{ url_for('main.blog', post_id=0) }}">
+        <div class="box" id="index-blog-box">
+          <h3 class="box-title">Blog</h3>
+          <div class="image-box">
+            <img width="800" height="450" src="{{ url_for('static', filename='images/stock-pencil-1.jpg') }}" alt="pencil on paper"> 
+          </div>
+        </div>
+      </a>
+      <a class="box-link" href="{{ url_for('main.resources') }}">
+        <div class="box" id="index-about-box">
+          <h3 class="box-title">Resources</h3>
+          <div class="image-box">
+            <img width="800" height="450" src="{{ url_for('static', filename='images/bookshelf.jpg') }}" alt="books on a bookshelf"> 
+          </div>
+        </div>
+      </a>
     </div>
   </main>
 {% endblock %}

@@ -1,0 +1,22 @@
+main article img {
+  margin: 15px;
+  max-width: 30%;
+}
+
+main article .blog-controls {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+main article .blog-controls .blog-control-item {
+  list-style: none;
+}
+main article .blog-controls a {
+  color: $accent-contrast-dark;
+}
+main article .blog-controls a:active {
+  color: $accent-similar-dark;
+}
+main article .blog-controls a:visited {
+  color: $accent-contrast-light;
+}

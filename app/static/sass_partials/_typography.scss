@@ -1,22 +1,23 @@
 /* typography */
+// generic font resets etc
 html {
   font-size: 10px;
+  font-family: $header-font;
 }
 h1, h3 {
-  font-family: $header-font, serif;
+  font-family: $header-font;
   color: $primary-color;
 }
 p, blockquote, a {
-  font-family: $body-font;
+  font-family: $body-text-font;
 }
 h1 {
   font-size: 3rem;
   margin: 0;
 }
 h2 {
-  font-family: $body-font, sans-serif;
-  font-size: 1.8rem;
-  word-spacing: 2%;
+  font-family: $body-header-font;
+
 }
 h3 {
   font-size: 2rem;
@@ -24,21 +25,80 @@ h3 {
 }
 
 p, a {
-  font-size: 1.6rem;
-}
-blockquote {
-  font-family: $header-font;
-  font-style: italic;
-  line-height: 2em;
   font-size: 1.8rem;
 }
-.quote-author {
-  display: inline-block;
-  font-style: normal;
-}
+
 p {
   line-height: 2em;
 }
-.italic {
-  font-style: italic;
+
+// general body rules
+main {
+
+  .main-header {
+    // used as the single header of the main section
+    font-family: $body-header-font;
+    color: $primary-color;
+    font-size: 3rem;
+  }
+  .centered {
+    text-align: center;
+  }
+
+  .main-subheader {
+    font-family: $body-subheader-font;
+
+  }
+
+  .item-title {
+    // header when there are multiple headers
+    font-family: $item-title;
+    font-size: 3rem;
+    color: $primary-color;
+    letter-spacing: 0.1rem;
+    margin-top: 0;
+  }
+
+  .item-details {
+    font-family: $item-details;
+    color: $dark;
+    font-size: 1.6rem;
+    letter-spacing: 0.1rem;
+    margin: 0;
+  }
+
+  .item-text {
+    font-family: $item-text;
+  }
+
+  .item-link {
+    color: $accent-contrast-dark;
+  }
+  .item-link:visited {
+    color: $accent-contrast-light;
+  }
+
+  .item-link:active {
+    color: $dark;
+  }
+
+  .title-link {
+    text-decoration: none;
+  }
+  .title-link:active {
+    color: $dark;
+  }
+
+  article blockquote {
+    font-family: $item-text;
+    font-size: 1.8rem;
+
+  }
+}
+
+// contact form
+form .form-label {
+  font-family: $item-title;
+  font-size: 2rem;
+  letter-spacing: 0.2rem;
 }

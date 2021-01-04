@@ -1,5 +1,22 @@
 /* footer style */
+footer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  border-top: 1px solid $primary-color;
+  margin-top: 30px;
+}
 footer p {
-    text-align: center;
+  text-align: center;
+  color: $primary-color;
+  letter-spacing: 0.2rem;
+  font-size: 1.2rem;
+  margin: 25px;
   }
+
+footer a {
+  color: $primary-color;
+  letter-spacing: 0.2rem;
+  font-size: 1.2rem;
+}
   

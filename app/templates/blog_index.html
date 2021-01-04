@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block body %}
+  <main>
+    {% for post in posts %}
+      <section class="item-box">
+        <a class='title-link' href="{{ url_for('main.blog', post_id=post['id']) }}">
+          <h2 class="item-title">{{ post['title'] }}</h2>
+        </a>
+        <div class="details-container">
+            <h4 class="item-details">{{ post['author'] }}</h4>
+            <h4 class="item-details">{{ post['pub_date'] }}</h4>
+        </div>
+        <p class="item-text">{{ post['text'] }}</p>
+      </section>
+
+    {% endfor %}
+
+  </main>
+{% endblock %}

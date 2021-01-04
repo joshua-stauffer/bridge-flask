@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block body %}
+  <main>
+    {% for resource in resources %}
+      <section class="item-box">
+        <h4 class="item-title">{{ resource['title'] }}</h4>
+        {% if resource['text'] %}
+          <p class="item-text">
+              {{ resource['text'] }}
+          </p>
+        {% endif %}
+        {% if resource['uri'] %}
+          <a class="item-link" href="{{ resource['uri'] }}">
+            {% if resource['uri_title'] %}
+              {{ resource['uri_title'] }}
+            {% else %}
+              {{ resource['uri'] }}
+            {% endif %}
+          </a>
+        {% endif %}
+        </section>
+    {% endfor %}
+  </main>
+{% endblock %}

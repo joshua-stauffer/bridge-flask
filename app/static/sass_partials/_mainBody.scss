@@ -1,24 +1,37 @@
-/* main section style */
-main .video {
-  position: relative;
-  padding-bottom: 56.25%;
-}
-main iframe {
-  position: absolute;
-  top: 0;
-  left: 0;  object-fit: fill;
+main {
+  height: auto;
+  margin-right: 20px;
+  min-height: 55vh;
+
+  .video {
+    position: relative;
+    padding-bottom: 56.25%;
+  }
+  iframe {
+    position: absolute;
+    top: 0;
+    left: 0;  object-fit: fill;
+  }
+  
+  .details-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 0;
+  }
+  .item-link {
+    color: $accent-contrast-dark;
+    h2 {
+      color: $accent-contrast-dark;
+    }
   }
 
-// front page flex boxes
-main .box-wrapper {
-  display: flex;
-  flex-wrap: wrap;
+  // this holds blog_index and resource entries
+  .item-box {
+    margin-bottom: 20px;
+    // border: solid 1px $primary-color;
+    padding: 20px;
+  }
+  
 }
 
-main .box {
-  width: 200px;
-  height: 200px;
-  margin: 5%;
-  flex-grow: 1;
-  border: solid 1px green;
-}

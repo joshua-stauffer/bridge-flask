@@ -5,8 +5,41 @@ $accent-similar-dark: #3B7D60; /* accent-similar-dark: Amazon */
 $accent-contrast-light: #6E62A7; /* accent-contrast-light: Dark Blue Gray */
 $accent-contrast-dark: #342c63ff; /* accent-contrast-dark: space cadet */
 $background-color: #ffffffff; // background-color: white
+$dark: #464646;
+
+// previous fonts:
+// crimson text
+// raleway
+@import url('https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,300;0,400;1,200;1,300&display=swap');
+// quicksand
+
 
 // fonts
-$header-font: 'Crimson Text', serif;
-$header-font: 'Raleway', sans-serif;
+//josefin slab
+@import url('https://fonts.googleapis.com/css2?family=Josefin+Slab:wght@400;500&display=swap');
+
+//
+@import url('https://fonts.googleapis.com/css2?family=Nothing+You+Could+Do&display=swap');
+
+// raleway
+
+// julius sans
+@import url('https://fonts.googleapis.com/css2?family=Julius+Sans+One&display=swap');
+
+$header-font:  'Raleway', sans-serif;
+//$header-font: 'Raleway', sans-serif;
 $body-font: 'Quicksand', sans-serif;
+
+// new variables
+$logo-main-font: 'Nothing You Could Do';
+$logo-sub-font: $header-font;
+$body-header-font: $header-font;
+$body-subheader-font: $header-font;
+$body-text-font: $header-font;
+$item-title: $header-font;
+$item-details: $header-font;
+$item-text: $header-font;
+$navbar-font: $header-font;
+$quote-font: $header-font;
+
+$breakpoint: 887px;
