@@ -65,31 +65,86 @@ class User(UserMixin, db.Model):
 class Quote(db.Model):
     __tablename__ = 'quotes'
     id = db.Column(db.Integer, primary_key=True)
-    author = db.Column(db.String(128), nullable=False)
-    text = db.Column(db.Text, nullable=False)
+    author = db.Column(db.String(128), nullable=True, default='')
+    text = db.Column(db.Text, nullable=True, default='')
+    published = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
         return f'"{self.text}" \n-{self.author}'
 
     # API access point
-    @staticmethod
-    def to_dict_list():
+    @classmethod
+    def to_dict_list(cls):
         return [
-            {'author': q.author, 'text': q.text}
-            for q in Quote.query.all()
+            {'author': q.author, 'text': q.text, 'id': q.id}
+            for q in cls.query.all()
         ]
+
+    @classmethod
+    def get_edit_list(cls):
+        return [
+            {
+                'secondary': q.author, 
+                'primary': get_preview_text(q.text, 50),
+                'id': q.id,
+                'published': q.published
+            } for q in cls.query.all()
+        ]
+
+    @classmethod
+    def get_by_id(cls, id):
+        quote = cls.query.filter_by(id=id).first_or_404()
+        return {
+            'id': quote.id,
+            'text': quote.text,
+            'author': quote.author,
+            'published': quote.published
+        }
+
+    @classmethod
+    def get_new(cls):
+        new_quote = cls()
+        db.session.add(new_quote)
+        db.session.commit()
+        return {
+            'id': new_quote.id,
+            'text': new_quote.text,
+            'author': new_quote.author,
+            'published': new_quote.published
+        }
+
+    @classmethod
+    def delete(cls, id):
+        quote = cls.query.filter_by(id=id).first_or_404()
+        db.session.delete(quote)
+        db.session.commit()
+
+    @classmethod
+    def save(cls, data):
+        quote = cls.query.filter_by(id=data['id']).first_or_404()
+        quote.published = data['published']
+        quote.author = data['author']
+        quote.text = data['text']
+        db.session.add(quote)
+        db.session.commit()
+        return {
+            'id': quote.id,
+            'text': quote.text,
+            'author': quote.author,
+            'published': quote.published
+        }
 
 
 class Post(db.Model):
     __tablename__ = 'posts'
     id = db.Column(db.Integer, primary_key=True)
     author_id = db.Column(db.Integer, db.ForeignKey(User.id))
-    title = db.Column(db.String(128), nullable=False)
+    title = db.Column(db.String(128), nullable=True, default='')
     sub_title = db.Column(db.String(128), nullable=True)
     date_created = db.Column(db.DateTime, default=datetime.utcnow)
     date_updated = db.Column(db.DateTime, nullable=True)
     contents = db.relationship('PostContents', backref='post')
-    published = db.Column(db.Boolean)
+    published = db.Column(db.Boolean, default=False)
 
     @property
     def pub_date(self):
@@ -199,9 +254,10 @@ class PostContents(db.Model):
     post_id = db.Column(db.Integer, db.ForeignKey(Post.id))
     order = db.Column(db.Integer)
     content_type = db.Column(db.String(8))
-    payload = db.Column(db.Text)
+    payload = db.Column(db.Text, default='')
     uri = db.Column(db.String(128))
     css = db.Column(db.String(128))
+    published = db.Column(db.Boolean, default=False)
 
     def to_json(self):
         return {
@@ -230,9 +286,10 @@ class Node(db.Model):
     """
     __tablename__ = 'nodes'
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(32), nullable=False)
+    title = db.Column(db.String(32), nullable=True)
     definition = db.Column(db.Text(), nullable=True)
     example = db.Column(db.Text(), nullable=True)
+    published = db.Column(db.Boolean, default=False)
 
     _synonyms = db.Column(db.Text(), nullable=True)
     _antonyms = db.Column(db.Text(), nullable=True)
@@ -308,6 +365,7 @@ class Video(db.Model):
     url = db.Column(db.String(128))
     title = db.Column(db.String(128))
     description = db.Column(db.Text())
+    published = db.Column(db.Boolean, default=False)
 
     def to_json(self):
         return {
@@ -330,6 +388,7 @@ class Resource(db.Model):
     order = db.Column(db.Integer)
     uri = db.Column(db.String(128))
     uri_title = db.Column(db.String(128))
+    published = db.Column(db.Boolean, default=False)
 
     @classmethod
     def get_all(cls):
@@ -345,6 +404,15 @@ class Resource(db.Model):
         if not len(results):
             return [empty_resources_error]
         return results
+
+    @classmethod
+    def get_edit_list(cls):
+        return [{
+            'primary': r.title,
+            'secondary': get_preview_text(r.text, 50),
+            'id': r.id,
+            'index': r.order
+        } for r in cls.query.order_by(Resource.order).all()]
 
 
 # user loader function

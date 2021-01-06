@@ -1,0 +1,11 @@
+{
+  "data": [
+    {"id": 1, "index": 0, "title": "Resource 1", "edited": false},
+    {"id": 2, "index": 1, "title": "Resource 2", "edited": false},
+    {"id": 3, "index": 2, "title": "Resource 3", "edited": false},
+    {"id": 4, "index": 3, "title": "Resource 4", "edited": false},
+    {"id": 5, "index": 4, "title": "Resource 5", "edited": false},
+    {"id": 6, "index": 5, "title": "Resource 6", "edited": false},
+    {"id": 7, "index": 6, "title": "Resource 7", "edited": false}
+  ]
+}
