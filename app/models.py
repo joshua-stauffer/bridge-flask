@@ -69,10 +69,75 @@ class Quote(db.Model):
     text = db.Column(db.Text, nullable=True, default='')
     published = db.Column(db.Boolean, default=False)
 
+    def to_json(self):
+        return {
+            'id': self.id,
+            'author': self.author,
+            'text': self.text,
+            'published': self.published
+        }
+
     def __repr__(self):
         return f'"{self.text}" \n-{self.author}'
 
-    # API access point
+    # dashboard api methods
+    @classmethod
+    def get_all_private(cls):
+        return [
+            {
+                'secondary': q.author, 
+                'primary': get_preview_text(q.text, 50),
+                'id': q.id,
+                'published': q.published
+            } for q in cls.query.all()]
+
+    @classmethod
+    def get_by_id(cls, id):
+        quote = cls.query.filter_by(id=id).first_or_404()
+        return quote.to_json()
+
+    @classmethod
+    def delete(cls, id):
+        quote = cls.query.filter_by(id=id).first_or_404()
+        db.session.delete(quote)
+        db.session.commit()
+
+    @classmethod
+    def update_by_id(cls, id, data):
+        quote = cls.query.filter_by(id=id).first_or_404()
+
+        # could do this more programatically, but prefer the explicit approach for now
+        quote.text = data['text']
+        quote.author = data['author']
+        quote.published = data['published']
+
+        db.session.add(quote)
+        db.session.commit()
+
+        # remember, this needs to return the object
+        return quote.to_json()
+
+    @classmethod
+    def update_batch(cls, data):
+        edited_quotes = list()
+        for d in data:
+            quote = cls.query.filter_by(id=d.id).first_or_404()
+            quote.text = d['text']
+            quote.author = d['author']
+            quote.published = d['published']
+            edited_quotes.append(quote)
+
+        db.session.add_all(edited_quotes)
+        db.session.commit()
+
+    @classmethod
+    def new(cls):
+        quote = cls()
+        db.session.add(quote)
+        db.session.commit()
+""" 
+
+    # old API access point
     @classmethod
     def to_dict_list(cls):
         return [
@@ -131,8 +196,8 @@ class Quote(db.Model):
             'id': quote.id,
             'text': quote.text,
             'author': quote.author,
-            'published': quote.published
-        }
+            'published': quote.published }
+ """       
 
 
 class Post(db.Model):
@@ -286,20 +351,25 @@ class Node(db.Model):
     """
     __tablename__ = 'nodes'
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(32), nullable=True)
-    definition = db.Column(db.Text(), nullable=True)
-    example = db.Column(db.Text(), nullable=True)
+    title = db.Column(db.String(32), nullable=True, default='')
+    definition = db.Column(db.Text(), nullable=True, default='')
+    example = db.Column(db.Text(), nullable=True, default='')
     published = db.Column(db.Boolean, default=False)
 
     _synonyms = db.Column(db.Text(), nullable=True)
     _antonyms = db.Column(db.Text(), nullable=True)
-
     # methods for getting and setting synonyms and antonyms
+    # both synonyms and antonyms can be treated as a list, and 
+    # internally will be converted to/from a comma separated string
     @property
     def synonyms(self):
         if self._synonyms:
             return self._synonyms.split(',')
         return []
+
+    @synonyms.setter
+    def synonyms(self, synonyms_list):
+        self._synonyms = ','.join(synonyms_list)
     
     def add_synonym(self, value):
         if self._synonyms:
@@ -326,6 +396,10 @@ class Node(db.Model):
         if self._antonyms:
             return self._antonyms.split(',')
         return []
+
+    @antonyms.setter
+    def antonyms(self, antonyms_list):
+        self._antonyms = ','.join(antonyms_list)
     
     def add_antonym(self, value):
         if self._antonyms:
@@ -344,34 +418,133 @@ class Node(db.Model):
         del updated_antonyms[index]
         self._antonyms = ''
         for w in updated_antonyms:
-            self.add_synonym(w)
+            self.add_antonym(w)
         return True
 
     def __repr__(self):
         return f'{self.title}\nSynonyms: {self.synonyms}\nAntonyms: {self.antonyms}'
 
+    # create text property so api is consistent
+    @property
+    def text(self):
+        return self.definition
+
+    @text.setter
+    def text(self, val):
+        self.definition = val
+
+    def to_json(self):
+        word_list = Node.get_all_words()
+        return {
+            'id': self.id,
+            'title': self.title,
+            'text': self.text,
+            'example': self.example,
+            'published': self.published,
+            'synonyms': self.synonyms,
+            'antonyms': self.antonyms,
+            'word_list': word_list
+        }
+
     # API access point
-    @staticmethod
-    def to_dict():
+    @classmethod
+    def to_dict(cls):
         """Returns a dictionary of all available Node data."""
-        data = Node.query.all()
+        data = cls.query.all()
         return {d.title: node_to_json(d) for d in data}
+
+    # dashboard api methods
+    @classmethod
+    def get_all_private(cls):
+        return [
+            {
+                'secondary': d.title, 
+                'primary': get_preview_text(d.text, 50),
+                'id': d.id,
+                'published': d.published
+            } for d in cls.query.all()]
+
+    @classmethod
+    def get_by_id(cls, id):
+        node = cls.query.filter_by(id=id).first_or_404()
+        return node.to_json()
+
+    @classmethod
+    def delete(cls, id):
+        node = cls.query.filter_by(id=id).first_or_404()
+        db.session.delete(node)
+        db.session.commit()
+
+    @classmethod
+    def update_by_id(cls, id, data):
+        node = cls.query.filter_by(id=id).first_or_404()
+
+        # could do this more programatically, but prefer the explicit approach for now
+        node.title = data['title']
+        node.text = data['text']
+        node.published = data['published']
+        node.example = data['example']
+        node.synonyms = data['synonyms']
+        node.antonyms = data['antonyms']
+
+        db.session.add(node)
+        db.session.commit()
+    
+        # remember, this view needs to return the saved item
+        return node.to_json()
+        
+
+    @classmethod
+    def update_batch(cls, data):
+        edited_nodes = list()
+        for d in data:
+            node = cls.query.filter_by(id=d.id).first_or_404()
+            node.title = data['title']
+            node.text = data['text']
+            node.published = data['published']
+            node.example = data['example']
+            node.synonyms = data['synonyms']
+            node.antonyms = data['antonyms']
+            edited_nodes.append(node)
+
+        db.session.add_all(edited_nodes)
+        db.session.commit()
+
+    @classmethod
+    def new(cls):
+        node = cls()
+        db.session.add(node)
+        db.session.commit()
+
+    @classmethod
+    def get_all_words(cls):
+        return [w.title for w in cls.query.all()]
 
 
 class Video(db.Model):
     __tablename__ = 'videos'
     id = db.Column(db.Integer, primary_key=True)
     order = db.Column(db.Integer)
-    url = db.Column(db.String(128))
-    title = db.Column(db.String(128))
-    description = db.Column(db.Text())
+    url = db.Column(db.String(128), default='')
+    title = db.Column(db.String(128), default='')
+    description = db.Column(db.Text(), default='')
     published = db.Column(db.Boolean, default=False)
+
+    @property
+    def text(self):
+        return self.description
+
+    @text.setter
+    def text(self, val):
+        self.description = val
 
     def to_json(self):
         return {
-            'url': self.url,
+            'id': self.id,
+            'uri': self.url,
             'title': self.title,
-            'description': self.description
+            'text': self.description,
+            'published': self.published,
         }
 
     @classmethod
@@ -380,15 +553,98 @@ class Video(db.Model):
         return [video.to_json() for video in video_list]
 
 
+    # dashboard api methods
+    @classmethod
+    def get_all_private(cls):
+        return [
+            {
+                'secondary': v.title, 
+                'primary': get_preview_text(v.text, 50),
+                'id': v.id,
+                'published': v.published
+            } for v in cls.query.all()]
+
+    @classmethod
+    def get_by_id(cls, id):
+        video = cls.query.filter_by(id=id).first_or_404()
+        return video.to_json()
+
+    @classmethod
+    def delete(cls, id):
+        video = cls.query.filter_by(id=id).first_or_404()
+        db.session.delete(video)
+        db.session.commit()
+
+    @classmethod
+    def update_by_id(cls, id, data):
+        video = cls.query.filter_by(id=id).first_or_404()
+
+        # could do this more programatically, but prefer the explicit approach for now
+        video.title = data['title']
+        video.text = data['text']
+        video.url = data['uri']
+        video.published = data['published']
+
+        db.session.add(video)
+        db.session.commit()
+    
+        # remember, this view needs to return the saved item
+        return video.to_json()
+        
+
+    @classmethod
+    def update_batch(cls, data):
+        edited_videos = list()
+        for d in data:
+            video = cls.query.filter_by(id=d.id).first_or_404()
+            video.title = d['title']
+            video.text = d['text']
+            video.order = d['order']
+            video.uri = d['uri']
+            video.uri_title = d['uri_title']
+            video.published = d['published']
+            edited_videos.append(video)
+
+        db.session.add_all(edited_videos)
+        db.session.commit()
+
+    @classmethod
+    def new(cls):
+        video = cls()
+        db.session.add(video)
+        db.session.commit()
+
+    @classmethod
+    def new_by_order(cls, order_id):
+        cur_videos = cls.query.all()
+        for r in cur_videos:
+            if r.order >= order_id:
+                r.order += 1
+        new_video = cls(order=order_id)
+        db.session.add_all([*cur_videos, new_video])
+        db.session.commit()
+
+
 class Resource(db.Model):
     __tablename__ = 'resources'
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(128))
-    text = db.Column(db.Text())
+    title = db.Column(db.String(128), default='')
+    text = db.Column(db.Text(), default='')
     order = db.Column(db.Integer)
-    uri = db.Column(db.String(128))
-    uri_title = db.Column(db.String(128))
+    uri = db.Column(db.String(128), default='')
+    uri_title = db.Column(db.String(128), default='')
     published = db.Column(db.Boolean, default=False)
+
+    def to_json(self):
+        return {
+            'title': self.title,
+            'id': self.id,
+            'text': self.text,
+            'order': self.order,
+            'uri': self.uri,
+            'uri_title': self.uri_title,
+            'published': self.published
+        }
 
     @classmethod
     def get_all(cls):
@@ -405,14 +661,78 @@ class Resource(db.Model):
             return [empty_resources_error]
         return results
 
+    # dashboard api methods
     @classmethod
-    def get_edit_list(cls):
-        return [{
-            'primary': r.title,
-            'secondary': get_preview_text(r.text, 50),
-            'id': r.id,
-            'index': r.order
-        } for r in cls.query.order_by(Resource.order).all()]
+    def get_all_private(cls):
+        return [
+            {
+                'secondary': r.title, 
+                'primary': get_preview_text(r.text, 50),
+                'id': r.id,
+                'published': r.published
+            } for r in cls.query.all()]
+
+    @classmethod
+    def get_by_id(cls, id):
+        resource = cls.query.filter_by(id=id).first_or_404()
+        return resource.to_json()
+
+    @classmethod
+    def delete(cls, id):
+        resource = cls.query.filter_by(id=id).first_or_404()
+        db.session.delete(resource)
+        db.session.commit()
+
+    @classmethod
+    def update_by_id(cls, id, data):
+        resource = cls.query.filter_by(id=id).first_or_404()
+
+        # could do this more programatically, but prefer the explicit approach for now
+        resource.title = data['title']
+        resource.text = data['text']
+        resource.order = data['order']
+        resource.uri = data['uri']
+        resource.uri_title = data['uri_title']
+        resource.published = data['published']
+
+        db.session.add(resource)
+        db.session.commit()
+
+        # remember, this view needs to return the saved item
+        return resource.to_json()
+
+
+    @classmethod
+    def update_batch(cls, data):
+        edited_resources = list()
+        for d in data:
+            resource = cls.query.filter_by(id=d.id).first_or_404()
+            resource.title = d['title']
+            resource.text = d['text']
+            resource.order = d['order']
+            resource.uri = d['uri']
+            resource.uri_title = d['uri_title']
+            resource.published = d['published']
+            edited_resources.append(resource)
+
+        db.session.add_all(edited_resources)
+        db.session.commit()
+
+    @classmethod
+    def new(cls):
+        resource = cls()
+        db.session.add(resource)
+        db.session.commit()
+
+    @classmethod
+    def new_by_order(cls, order_id):
+        cur_resources = cls.query.all()
+        for r in cur_resources:
+            if r.order >= order_id:
+                r.order += 1
+        new_resource = cls(order=order_id)
+        db.session.add_all([*cur_resources, new_resource])
+        db.session.commit()
 
 
 # user loader function
