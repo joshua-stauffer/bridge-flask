@@ -144,6 +144,45 @@ def sp_videos(id):
     return jsonify(Video.get_all_private())
 
 
+@api.route('/blog', methods=['GET', 'PUT', 'POST'])
+def gen_blog():
+    
+    if request.method == 'GET':
+        pass
+
+    elif request.method == 'PUT':
+        data = request.get_json()
+        Post.update_batch(data)
+
+    elif request.method == 'POST':
+        Post.new()
+    
+    return jsonify(Post.get_all_private())
+
+
+@api.route('/blog-<id>', methods=['GET', 'POST', 'PUT', 'DELETE'])
+def sp_blog(id):
+    
+    if request.method == 'GET':
+        return Post.get_by_id_private(id)
+    
+    elif request.method == 'PUT':
+        # must return the saved object
+        data = request.get_json()
+        print('data is ', data)
+        new_Post = Post.update_by_id(id, data)
+        return new_Post
+        
+    elif request.method == 'POST':
+        # in this case, the id is actually the index where we want to place the new element
+        Post.new_by_order(id)
+
+    elif request.method == 'DELETE':
+        Post.delete(id)
+        
+    return jsonify(Post.get_all_private())
+
+
 @api.route('/thesaurus', methods=['GET', 'PUT', 'POST'])
 def gen_thesaurus():
     print('entered gen_thesaurus with the method ', request.method)

@@ -312,6 +312,78 @@ class Post(db.Model):
             next_post_id=next_post_id
         )
 
+    # dashboard api methods
+    def to_json(self):
+        blog_contents = sorted(self.contents, key=lambda d: d.order)
+        if not blog_contents:
+            blog_contents = []
+        return {
+            'title': self.title,
+            'sub_title': self.sub_title,
+            'date_created': self.date_created,
+            'date_updated': self.date_updated,
+            'published': self.published,
+            'contents': [c.to_json() for c in blog_contents]
+        }
+
+    @classmethod
+    def get_all_private(cls):
+        return [
+            {
+                'primary': d.title, 
+                'secondary': d.date_created,
+                'id': d.id,
+                'published': d.published
+            } for d in cls.query.all()]
+
+    @classmethod
+    # note that this function is named differently to avoid a clash with the frontend api
+    def get_by_id_private(cls, id):
+        post = cls.query.filter_by(id=id).first_or_404()
+        return post.to_json()
+
+    @classmethod
+    def delete(cls, id):
+        post = cls.query.filter_by(id=id).first_or_404()
+        db.session.delete(post)
+        db.session.commit()
+
+    @classmethod
+    def update_by_id(cls, id, data):
+        post = cls.query.filter_by(id=id).first_or_404()
+
+        # could do this more programatically, but prefer the explicit approach for now
+        post.title = data['title']
+        post.sub_title = data['sub_title']
+        post.published = data['published']
+        if data['update_timestamp']:
+            post.date_updated = datetime.utcnow()
+        post.contents = PostContents.update_contents(id, data['contents'])
+
+        db.session.add(post)
+        db.session.commit()
+    
+        # remember, this view needs to return the saved item
+        return post.to_json()
+        
+
+    @classmethod
+    def update_batch(cls, data):
+        edited_posts = list()
+        for d in data:
+            post = cls.query.filter_by(id=d.id).first_or_404()
+            post.order = data['order']
+            edited_posts.append(post)
+
+        db.session.add_all(edited_posts)
+        db.session.commit()
+
+    @classmethod
+    def new(cls):
+        post = cls(author_id=1)  #TODO: update this to be the actual user
+        db.session.add(post) 
+        db.session.commit()
+
 
 class PostContents(db.Model):
     __tablename__ = 'post_contents'
@@ -322,17 +394,76 @@ class PostContents(db.Model):
     payload = db.Column(db.Text, default='')
     uri = db.Column(db.String(128))
     css = db.Column(db.String(128))
+    # not sure a published column is necessary after all
     published = db.Column(db.Boolean, default=False)
 
     def to_json(self):
         return {
             'id': self.id,
+            'post_id': self.post_id,
             'order': self.order,
-            'type': self.content_type,
+            'content_type': self.content_type,
             'payload': self.payload,
             'uri': self.uri,
-            'css': self.css
+            'css': self.css,
         }
+
+    @classmethod
+    def update_contents(cls, id, contents):
+        cur_contents = cls.query.filter_by(post_id=id).all()
+        contents_dict = {c['id']: c for c in contents if c['id']}
+
+        # no id? create new PostContents row
+        to_add = [
+            PostContents(
+                order=c['order'],
+                content_type=c['content_type'],
+                payload=c['payload'],
+                uri=c['uri'],
+                css=c['css'],
+                post_id=c['post_id']
+                )
+            for c in contents if not c['id']
+        ]
+
+        to_del = []
+        for pc in cur_contents:
+
+            if pc.id in contents_dict.keys():
+                d = contents_dict[pc.id]
+                pc.order = d['order']
+                pc.content_type = d['content_type']
+                pc.payload = d['payload']
+                pc.uri = d['uri']
+                pc.css = d['css']
+                to_add.append(pc)
+
+            else:
+                to_del.append(pc)
+                
+        for pc in to_del:
+            db.session.delete(pc)
+        db.session.add_all(to_add)
+        db.session.commit()
+        return to_add
+
+
+    @classmethod
+    def edit_post_contents_by_id(cls, id, data):
+        p = cls.query.filter_by(id=id).first()
+        if not p:
+            # in this case, be forgiving with a missing entry and make a new one
+            p = PostContents()
+        
+        p.order=data['order']
+        p.post_id=data['post_id']
+        p.content_type=data['content_type']
+        p.payload=data['payload']
+        p.uri=data['uri']
+        p.css=data['css']
+
+        # not saving data here
+        return p
 
 
 class Node(db.Model):
