@@ -18,20 +18,20 @@
       </div>
 
       {% for content in post_content %}
-        {% if content['type'] == 'p'%}
+        {% if content['content_type'] == 'p'%}
           <p class="item-text" style="{{ content['css'] }}">{{ content['payload'] }}</p>
-        {% elif content['type'] == 'title' %}
+        {% elif content['content_type'] == 'title' %}
           <h2 class="item-title" style="{{ content['css'] }}">{{ content['payload'] }}</h2>
-        {% elif content['type'] == 'video' %}
+        {% elif content['content_type'] == 'video' %}
           <div class="video-container" style="{{ content['css'] }}">
             <iframe alt="{{ content['payload'] }}" width="100%" height="100%" src="{{ content['uri'] }}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
           </div>
-        {% elif content['type'] == 'img' %}
+        {% elif content['content_type'] == 'img' %}
           <img class="inline-image" alt="{{ content['payload'] }}" src="{{ content['uri'] }}" style="{{ content['css'] }}">
         {% else %}
           <h1> ERROR!!! BLOG TEMPLATE PASSED UNKNOWN OBJECT: </h1>
           <ul>
-            {% for k, v in post_content.items() %}
+            {% for k, v in content.items() %}
               <li>{{ k }} : {{ v }}</li>
             {% endfor %}
         {% endif %}

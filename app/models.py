@@ -135,15 +135,18 @@ class Quote(db.Model):
         quote = cls()
         db.session.add(quote)
         db.session.commit()
-""" 
 
-    # old API access point
+
     @classmethod
     def to_dict_list(cls):
         return [
             {'author': q.author, 'text': q.text, 'id': q.id}
-            for q in cls.query.all()
+            for q in cls.query.filter_by(published=True).all()
         ]
+""" 
+
+    # old API access point
+
 
     @classmethod
     def get_edit_list(cls):
@@ -210,6 +213,7 @@ class Post(db.Model):
     date_updated = db.Column(db.DateTime, nullable=True)
     contents = db.relationship('PostContents', backref='post')
     published = db.Column(db.Boolean, default=False)
+    order = db.Column(db.Integer)
 
     @property
     def pub_date(self):
@@ -252,7 +256,9 @@ class Post(db.Model):
                     ), max_char_count=200),
                     'id': p.id
                 }
-                for p in cls.query.order_by(Post.date_created).all()
+                for p in cls.query \
+                    .filter_by(published=True) \
+                    .order_by(cls.date_created).all()
             ]
 
     @classmethod
@@ -333,7 +339,8 @@ class Post(db.Model):
                 'primary': d.title, 
                 'secondary': d.date_created,
                 'id': d.id,
-                'published': d.published
+                'published': d.published,
+                'order': d.order
             } for d in cls.query.all()]
 
     @classmethod
@@ -366,13 +373,13 @@ class Post(db.Model):
         # remember, this view needs to return the saved item
         return post.to_json()
         
-
     @classmethod
     def update_batch(cls, data):
+        # just used to update order
         edited_posts = list()
         for d in data:
-            post = cls.query.filter_by(id=d.id).first_or_404()
-            post.order = data['order']
+            post = cls.query.filter_by(id=d['id']).first_or_404()
+            post.order = d['order']
             edited_posts.append(post)
 
         db.session.add_all(edited_posts)
@@ -380,8 +387,9 @@ class Post(db.Model):
 
     @classmethod
     def new(cls):
-        post = cls(author_id=1)  #TODO: update this to be the actual user
-        db.session.add(post) 
+        order = len(cls.query.all())
+        post = cls(order=order, author_id=1)
+        db.session.add(post)
         db.session.commit()
 
 
@@ -581,7 +589,7 @@ class Node(db.Model):
     @classmethod
     def to_dict(cls):
         """Returns a dictionary of all available Node data."""
-        data = cls.query.all()
+        data = cls.query.filter_by(published=True).all()
         return {d.title: node_to_json(d) for d in data}
 
     # dashboard api methods
@@ -680,7 +688,10 @@ class Video(db.Model):
 
     @classmethod
     def get_all(cls):
-        video_list = cls.query.order_by(Video.order).all()
+        video_list = cls.query \
+            .filter_by(published=True) \
+            .order_by(Video.order) \
+            .all()
         return [video.to_json() for video in video_list]
 
 
@@ -692,7 +703,8 @@ class Video(db.Model):
                 'secondary': v.title, 
                 'primary': get_preview_text(v.text, 50),
                 'id': v.id,
-                'published': v.published
+                'published': v.published,
+                'order': v.order
             } for v in cls.query.all()]
 
     @classmethod
@@ -725,15 +737,11 @@ class Video(db.Model):
 
     @classmethod
     def update_batch(cls, data):
+        # just used to update order
         edited_videos = list()
         for d in data:
-            video = cls.query.filter_by(id=d.id).first_or_404()
-            video.title = d['title']
-            video.text = d['text']
+            video = cls.query.filter_by(id=d['id']).first_or_404()
             video.order = d['order']
-            video.uri = d['uri']
-            video.uri_title = d['uri_title']
-            video.published = d['published']
             edited_videos.append(video)
 
         db.session.add_all(edited_videos)
@@ -741,9 +749,12 @@ class Video(db.Model):
 
     @classmethod
     def new(cls):
-        video = cls()
+        order = len(cls.query.all())
+        video = cls(order=order)
         db.session.add(video)
         db.session.commit()
+
+
 
     @classmethod
     def new_by_order(cls, order_id):
@@ -786,7 +797,7 @@ class Resource(db.Model):
             'order': r.order,
             'uri': r.uri,
             'uri_title': r.uri_title
-        } for r in cls.query.order_by(Resource.order).all()]
+        } for r in cls.query.filter_by(published=True).order_by(Resource.order).all()]
 
         if not len(results):
             return [empty_resources_error]
@@ -800,7 +811,8 @@ class Resource(db.Model):
                 'secondary': r.title, 
                 'primary': get_preview_text(r.text, 50),
                 'id': r.id,
-                'published': r.published
+                'published': r.published,
+                'order': r.order
             } for r in cls.query.all()]
 
     @classmethod
@@ -811,7 +823,15 @@ class Resource(db.Model):
     @classmethod
     def delete(cls, id):
         resource = cls.query.filter_by(id=id).first_or_404()
+        order = resource.order
+        resources = [
+            r for r in cls.query.all()
+            if r.id != id and r.order > order
+        ]
+        for r in resources:
+            r.order -= 1
         db.session.delete(resource)
+        db.session.add_all(resources)
         db.session.commit()
 
     @classmethod
@@ -835,15 +855,11 @@ class Resource(db.Model):
 
     @classmethod
     def update_batch(cls, data):
+        # just used to update order
         edited_resources = list()
         for d in data:
-            resource = cls.query.filter_by(id=d.id).first_or_404()
-            resource.title = d['title']
-            resource.text = d['text']
+            resource = cls.query.filter_by(id=d['id']).first_or_404()
             resource.order = d['order']
-            resource.uri = d['uri']
-            resource.uri_title = d['uri_title']
-            resource.published = d['published']
             edited_resources.append(resource)
 
         db.session.add_all(edited_resources)
@@ -851,7 +867,8 @@ class Resource(db.Model):
 
     @classmethod
     def new(cls):
-        resource = cls()
+        order = len(cls.query.all())
+        resource = cls(order=order)
         db.session.add(resource)
         db.session.commit()
 

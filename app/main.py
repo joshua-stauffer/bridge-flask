@@ -19,7 +19,7 @@ def index():
 
 @bp.route('/visual-thesaurus')
 def visual_thesaurus():
-    return redirect('http://localhost:3000/')
+    return redirect('http://localhost:3000/visual-thesaurus')
 
 
 @bp.route('/blog-<post_id>', methods=['GET'])
@@ -30,6 +30,8 @@ def blog(post_id):
         response = Post.get_most_recent()
     else:
         response = Post.get_by_id(post_id)
+
+    print('content is: ', response.content)
 
     return render_template(
             'blog.html', 

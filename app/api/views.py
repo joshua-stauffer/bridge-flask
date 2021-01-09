@@ -66,13 +66,13 @@ def sp_quotes(id):
     return jsonify(Quote.get_all_private())
 
 
-@api.route('/resources', methods=['GET', 'PUT', 'POST'])
+@api.route('/resources', methods=['GET', 'PATCH', 'POST'])
 def gen_resources():
     
     if request.method == 'GET':
         pass
 
-    elif request.method == 'PUT':
+    elif request.method == 'PATCH':
         data = request.get_json()
         Resource.update_batch(data)
 
@@ -105,13 +105,13 @@ def sp_resources(id):
     return jsonify(Resource.get_all_private())
 
 
-@api.route('/videos', methods=['GET', 'PUT', 'POST'])
+@api.route('/videos', methods=['GET', 'PATCH', 'POST'])
 def gen_videos():
     
     if request.method == 'GET':
         pass
 
-    elif request.method == 'PUT':
+    elif request.method == 'PATCH':
         data = request.get_json()
         Video.update_batch(data)
 
@@ -144,13 +144,13 @@ def sp_videos(id):
     return jsonify(Video.get_all_private())
 
 
-@api.route('/blog', methods=['GET', 'PUT', 'POST'])
+@api.route('/blog', methods=['GET', 'PATCH', 'POST'])
 def gen_blog():
     
     if request.method == 'GET':
         pass
 
-    elif request.method == 'PUT':
+    elif request.method == 'PATCH':
         data = request.get_json()
         Post.update_batch(data)
 
