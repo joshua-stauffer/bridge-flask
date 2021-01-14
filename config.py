@@ -15,6 +15,8 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_RECORD_QUERIES = True
     SLOW_DB_QUERY_TIME = 0.5
+    JWT_ACCESS_LIFESPAN = {"hours": 24}
+    JWT_REFRESH_LIFESPAN = {"days": 3}
 
     @staticmethod
     def init_app(app):

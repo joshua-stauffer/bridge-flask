@@ -1,12 +1,9 @@
 
 from datetime import datetime
 from flask import current_app, request, url_for, abort
-from flask_login import UserMixin
-import hashlib
-from werkzeug.security import generate_password_hash, check_password_hash
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from . import db
-from . import login_manager
+
+from . import db, guard
+
 from .utils.blog_tuple import BlogResponse
 from .utils.constants import empty_blog_error, empty_resources_error, empty_video_error
 from .utils.get_preview_text import get_preview_text
@@ -18,7 +15,7 @@ from .utils.to_json import node_to_json
 # foreign key goes in the child class
 
 
-class User(UserMixin, db.Model):
+class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(64), index=True, nullable=False)
@@ -28,35 +25,38 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     confirmed = db.Column(db.Boolean, default=False)
     posts = db.relationship('Post', backref='user')
+    roles = db.Column(db.String(64))
+    is_active = db.Column(db.Boolean, default=True)
 
     @property
     def password(self):
-        raise AttributeError('password is not a readable attribute')
+        return self.password_hash
 
     @password.setter
     def password(self, password):
-        self.password_hash = generate_password_hash(password)
+        self.password_hash = guard.hash_password(password)
 
-    def verify_password(self, password):
-        return check_password_hash(self.password_hash, password)
+    @property
+    def identity(self):
+        return self.id
 
-    def generate_confirmation_token(self, expiration=86400):
-        s = Serializer(current_app.config['SECRET_KEY'], expiration)
-        return s.dumps({'confirm': self.id}).decode('utf-8')
+    @classmethod
+    def lookup(cls, username):
+        return cls.query.filter_by(username=username).first_or_404()
 
-    def confirm(self, token):
-        s = Serializer(current_app.config['SECRET_KEY'])
+    @classmethod
+    def identify(cls, id):
+        return cls.query.get(id)
+
+    def is_valid(self):
+        return self.is_active
+
+    @property
+    def rolenames(self):
         try:
-            data = s.loads(token.encode('utf-8'))
-        except:
-            return False
-        if data.get('confirm') != self.id:
-            return False
-        self.confirmed = True
-        db.session.add(self)
-        return True
-
-    # add password reset
+            return self.roles.split(',')
+        except Exception:
+            return []
 
     def __repr__(self):
         return f'{self.first_name} {self.last_name}'
@@ -85,8 +85,8 @@ class Quote(db.Model):
     def get_all_private(cls):
         return [
             {
-                'secondary': q.author, 
-                'primary': get_preview_text(q.text, 50),
+                'primary': q.author, 
+                'secondary': get_preview_text(q.text, 50),
                 'id': q.id,
                 'published': q.published
             } for q in cls.query.all()]
@@ -597,8 +597,8 @@ class Node(db.Model):
     def get_all_private(cls):
         return [
             {
-                'secondary': d.title, 
-                'primary': get_preview_text(d.text, 50),
+                'primary': d.title, 
+                'secondary': get_preview_text(d.text, 50),
                 'id': d.id,
                 'published': d.published
             } for d in cls.query.all()]
@@ -700,8 +700,8 @@ class Video(db.Model):
     def get_all_private(cls):
         return [
             {
-                'secondary': v.title, 
-                'primary': get_preview_text(v.text, 50),
+                'primary': v.title, 
+                'secondary': get_preview_text(v.text, 50),
                 'id': v.id,
                 'published': v.published,
                 'order': v.order
@@ -808,8 +808,8 @@ class Resource(db.Model):
     def get_all_private(cls):
         return [
             {
-                'secondary': r.title, 
-                'primary': get_preview_text(r.text, 50),
+                'primary': r.title, 
+                'secondary': get_preview_text(r.text, 50),
                 'id': r.id,
                 'published': r.published,
                 'order': r.order
@@ -874,16 +874,11 @@ class Resource(db.Model):
 
     @classmethod
     def new_by_order(cls, order_id):
+        order = int(order_id)
         cur_resources = cls.query.all()
         for r in cur_resources:
-            if r.order >= order_id:
+            if r.order >= order:
                 r.order += 1
-        new_resource = cls(order=order_id)
+        new_resource = cls(order=order)
         db.session.add_all([*cur_resources, new_resource])
         db.session.commit()
-
-
-# user loader function
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))

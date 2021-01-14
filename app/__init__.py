@@ -1,18 +1,17 @@
 from flask import Flask
-from flask_login import LoginManager
 from flask_mail import Mail
 from flask_migrate import Migrate
 from config import config
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
+from flask_praetorian import Praetorian
+from flask_cors import CORS
 
-login_manager = LoginManager()
-# this sets a view that the login manager redirects to when an
-# anonymous user tries to access a protected view
-login_manager.login_view = 'auth.login'
+
 mail = Mail()
 migrate = Migrate()
-
+guard = Praetorian()
+cors = CORS()
 
 # create naming convention for Alembic migrations
 # as per Flask docs: https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/#using-custom-metadata-and-naming-conventions
@@ -31,12 +30,15 @@ db = SQLAlchemy(metadata=metadata)
 def create_app(config_name):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
-    print('just configured app')
+    # print('just configured app')
     print(app)
 
     mail.init_app(app)
     db.init_app(app)
-    login_manager.init_app(app)
+
+    from .models import User
+    guard.init_app(app, User)
+    cors.init_app(app)
 
     # set render_as_batch=True to fix sqlite migration issues
     # as per Miguel: https://youtu.be/wpRVZFwsD70
@@ -53,8 +55,6 @@ def create_app(config_name):
     # but in this case we want this to be the default
     app.add_url_rule('/', endpoint='index')
 
-    from .auth import auth as auth_blueprint
-    app.register_blueprint(auth_blueprint, url_prefix='/auth')
 
     from .api import api as api_blueprint
     app.register_blueprint(api_blueprint, url_prefix='/api')

@@ -1,0 +1,130 @@
+.Main {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  grid-template-rows: 80vh;
+  grid-template-areas: "main sidebar";
+}
+.container {
+  grid-area: main;
+}
+.sidebar {
+  grid-area: sidebar;
+}
+
+@media screen and (max-width: 600px) {
+  .Main {
+    grid-template-columns: 1fr;
+    grid-template-rows: 50vh;
+    grid-template-areas: "main"
+                          "sidebar";
+  }
+  .container {
+    height: auto;
+  }
+
+}
+
+.Main {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+
+.container {
+  grid-column: 1;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  height: 600px;
+  position: relative;
+}
+
+.container svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: solid 1px black;
+}
+
+// sidebar
+.sidebar {
+  grid-column: 2;
+  width: 100%;
+  height: 600px;
+  overflow-y: scroll;
+  border: solid 1px black;
+  padding-right: 0;
+  margin-right: 0;
+}
+.sidebar button {
+  font-family: $body-font;
+  font-size: 1.5rem;
+  width: 33.33333%;
+  height: 40px;
+  background-color: $primary-color;
+  color: $background-color;
+  border-radius: none;
+  border: none;
+  margin: 0;
+  margin-bottom: 10px;
+}
+.sidebar .active-button {
+  border-bottom: none;
+  background-color: $background-color;
+  color: $primary-color;
+}
+.sidebar .search-button-box {
+  display: flex;
+  align-items: center;
+}
+.sidebar .active-button:focus {
+  outline: none;
+  border-bottom: 1px dotted grey;
+}
+.sidebar .search-form {
+  display: flex;
+  flex-direction: column;
+}
+.sidebar .search-button {
+  align-self: center;
+  margin-top: 20px;
+}
+.sidebar-title {
+  font-size: 2.5rem;
+}
+.sidebar-text, .sidebar-title {
+  margin: 2% 5%;
+}
+
+.popup-aside .sidebar-text {
+  height: 28vh;
+  overflow-y: hidden;
+}
+
+.popup-subtitle {
+  font-size: 1.5rem;
+  font-weight: none;
+}
+
+.popup-aside {
+  border: double 1px black;
+  margin: 20px;
+}
+
+.search-bar {
+  width: 80%;
+  height: 40px;
+  margin-left: 10%;
+  font-size: 1.5rem;
+  border: solid 1px black;
+}
+.sidebar ul li {
+  list-style: none;
+  font-size: 1.5rem;
+}
+.case-warning {
+  line-height: normal;
+  font-size: 1rem;
+  align-self: center;
+}
+

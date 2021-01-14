@@ -2,7 +2,8 @@
 Base blueprint for flask app, returning main site functionality
 """
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, url_for, current_app
+    Blueprint, flash, g, redirect, render_template, request, url_for, 
+    current_app, send_from_directory
 )
 from . import forms
 from .models import Video, Post, Resource
@@ -19,7 +20,7 @@ def index():
 
 @bp.route('/visual-thesaurus')
 def visual_thesaurus():
-    return redirect('http://localhost:3000/visual-thesaurus')
+    return render_template('thesaurus.html')
 
 
 @bp.route('/blog-<post_id>', methods=['GET'])
@@ -93,3 +94,8 @@ def contact():
 def newsletter_signup():
     form = forms.NewsletterForm()
     return render_template('newsletter_form.html', form=form)
+
+
+@bp.route('/dashboard')
+def dashboard():
+    return render_template('dashboard.html')

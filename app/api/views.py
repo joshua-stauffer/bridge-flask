@@ -1,12 +1,10 @@
 from datetime import datetime
+from flask import render_template, request, url_for, redirect, flash, jsonify, abort
+import flask_praetorian
 
-from flask import render_template, request, url_for, redirect, flash, jsonify
-from flask_login import (
-    login_user, logout_user, login_required, current_user
-)
 from . import api
 # from .utils.to_json import node_to_json
-from .. import db
+from .. import db, guard
 from ..models import User, Quote, Post, Node, Resource, Video
 from ..app_mail import send_email
 
@@ -23,13 +21,26 @@ def qt_data():
 
 @api.route('/vt-data')
 def vt_data():
-    return Node.to_dict()
+    nodes = Node.to_dict()
+    print(f'vt_data is returning {nodes}')
+    return nodes
+
 
 #############################
 
+@api.route('/login', methods=['POST'])
+def login():
+    r = request.get_json(force=True)
+    username = r.get('username', None)
+    password = r.get('password', None)
+    user = guard.authenticate(username, password)
+    response = {'access_token': guard.encode_jwt_token(user)}
+    return response
+
+
 @api.route('/quotes', methods=['GET', 'PUT', 'POST'])
+@flask_praetorian.auth_required
 def gen_quotes():
-    print('entered gen_quotes with the method ', request.method)
 
     if request.method == 'GET':
         pass
@@ -37,7 +48,6 @@ def gen_quotes():
     #TODO: is this code needed?
     elif request.method == 'PUT':
         data = request.get_json()
-        print('found arguments in gen_quotes: ', data)
         Quote.update_batch(data)
 
     elif request.method == 'POST':
@@ -47,8 +57,8 @@ def gen_quotes():
 
 
 @api.route('/quotes-<id>', methods=['GET', 'PUT', 'DELETE'])
+@flask_praetorian.auth_required
 def sp_quotes(id):
-    print('got quote with id ', id)
 
     if request.method == 'GET':
         return Quote.get_by_id(id)
@@ -67,6 +77,7 @@ def sp_quotes(id):
 
 
 @api.route('/resources', methods=['GET', 'PATCH', 'POST'])
+@flask_praetorian.auth_required
 def gen_resources():
     
     if request.method == 'GET':
@@ -83,6 +94,7 @@ def gen_resources():
 
 
 @api.route('/resources-<id>', methods=['GET', 'POST', 'PUT', 'DELETE'])
+@flask_praetorian.auth_required
 def sp_resources(id):
     
     if request.method == 'GET':
@@ -97,6 +109,7 @@ def sp_resources(id):
         
     elif request.method == 'POST':
         # in this case, the id is actually the index where we want to place the new element
+        print(f'making new item with order {id}')
         Resource.new_by_order(id)
 
     elif request.method == 'DELETE':
@@ -106,6 +119,7 @@ def sp_resources(id):
 
 
 @api.route('/videos', methods=['GET', 'PATCH', 'POST'])
+@flask_praetorian.auth_required
 def gen_videos():
     
     if request.method == 'GET':
@@ -122,6 +136,7 @@ def gen_videos():
 
 
 @api.route('/videos-<id>', methods=['GET', 'POST', 'PUT', 'DELETE'])
+@flask_praetorian.auth_required
 def sp_videos(id):
     
     if request.method == 'GET':
@@ -145,6 +160,7 @@ def sp_videos(id):
 
 
 @api.route('/blog', methods=['GET', 'PATCH', 'POST'])
+@flask_praetorian.auth_required
 def gen_blog():
     
     if request.method == 'GET':
@@ -161,6 +177,7 @@ def gen_blog():
 
 
 @api.route('/blog-<id>', methods=['GET', 'POST', 'PUT', 'DELETE'])
+@flask_praetorian.auth_required
 def sp_blog(id):
     
     if request.method == 'GET':
@@ -184,6 +201,7 @@ def sp_blog(id):
 
 
 @api.route('/thesaurus', methods=['GET', 'PUT', 'POST'])
+@flask_praetorian.auth_required
 def gen_thesaurus():
     print('entered gen_thesaurus with the method ', request.method)
 
@@ -203,6 +221,7 @@ def gen_thesaurus():
 
 
 @api.route('/thesaurus-<id>', methods=['GET', 'PUT', 'DELETE'])
+@flask_praetorian.auth_required
 def sp_thesaurus(id):
     print('got quote with id ', id)
 
