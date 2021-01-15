@@ -16,6 +16,7 @@
         {% endif %}
         <h4 class="item-details">Published: {{ post_metadata['pub_date'] }}</h4>
       </div>
+      <hr>
 
       {% for content in post_content %}
         {% if content['content_type'] == 'p'%}

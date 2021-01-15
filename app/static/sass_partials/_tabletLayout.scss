@@ -1,6 +1,6 @@
 // tablet layout
 // deprecated as of dec. 30th 2020 (for the second time, thanks hard drive..)
-@media (min-width: 600px){
+@media (min-width: $mobile-breakpoint){
   .main-wrapper {
       grid-template-areas: 
       "banner banner"

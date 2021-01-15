@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block body %}
+  <main>
+    <h2 class="main-header">{{ term['title'] }}</h2>
+    <h3 class="item-header">Synonyms</h3>
+    <ul class="alt-thesaurus-list">
+    {% for word in term['synonyms'] %}
+      {% if word[1] %}
+        <li><a class="item-link" href="{{ url_for('main.alt_thesaurus_by_id', id=word[1]) }}">{{ word[0] }}</a></li>
+      {% else %} 
+        <li>{{ word[0] }}</li>
+      {% endif %}
+    {% endfor %}
+    </ul>
+
+    <h3 class="item-header">Antonyms</h3>
+    <ul class="alt-thesaurus-list">
+    {% for word in term['antonyms'] %}
+      {% if word[1] %}
+        <li><a class="item-link" href="{{ url_for('main.alt_thesaurus_by_id', id=word[1]) }}">{{ word[0] }}</a></li>
+      {% else %} 
+        <li>{{ word[0] }}</li>
+      {% endif %}
+    {% endfor %}
+    </ul>
+    <hr>
+    <h3 class="item-header">Definition</h3>
+    <p class="item-text" >{{ term['text'] }}</p>
+    <h3 class="item-header">Example</h3>
+    <p class="item-text">{{ term['example'] }}</p>
+
+  </main>
+{% endblock %}
+
+
+<!--
+
+  {% for resource in resources %}
+      <section class="item-box">
+        <h4 class="item-title">{{ resource['title'] }}</h4>
+        {% if resource['text'] %}
+          <p class="item-text">
+              {{ resource['text'] }}
+          </p>
+        {% endif %}
+        {% if resource['uri'] %}
+          <a class="item-link" href="{{ resource['uri'] }}" target="_blank">
+            {% if resource['uri_title'] %}
+              {{ resource['uri_title'] }}
+            {% else %}
+              {{ resource['uri'] }}
+            {% endif %}
+          </a>
+        {% endif %}
+        </section>
+    {% endfor %}
+-->

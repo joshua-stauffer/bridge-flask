@@ -25,7 +25,12 @@ h3 {
 }
 
 p, a {
-  font-size: 1.8rem;
+  font-size: 1.5rem;
+}
+@media screen and (min-width: $breakpoint) {
+  p, a {
+    font-size: 1.8rem;
+  }
 }
 
 p {
@@ -39,6 +44,9 @@ main {
     // used as the single header of the main section
     font-family: $body-header-font;
     color: $primary-color;
+    font-size: 2.2rem;
+  }
+  @media screen and (min-width: $breakpoint) {
     font-size: 3rem;
   }
   .centered {
@@ -47,7 +55,7 @@ main {
 
   .main-subheader {
     font-family: $body-subheader-font;
-
+    margin-bottom: 20px;
   }
 
   .item-title {

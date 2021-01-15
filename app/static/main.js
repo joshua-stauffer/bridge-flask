@@ -21,3 +21,12 @@ fetch(api.quote_api, headers)
     }
     changeQuote()
   })
+
+const toggleMenu = document.getElementById('toggle-menu')
+const menu = document.getElementById('menu')
+
+toggleMenu.addEventListener('click', () => {
+  menu.classList.length > 1 ? 
+    menu.className = 'navbar-list'
+    : menu.className = 'navbar-list folded'
+})

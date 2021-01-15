@@ -1,21 +1,54 @@
 /* aside style */
 aside {
     height: 100%;
-
     border-left: solid 1px $primary-color;
 }
+.quote-box {
+  height: 400px;
+  overflow-y: scroll;
+}
 blockquote {
-    font-family: $quote-font;
-    font-style: italic;
-    line-height: 2em;
-    font-size: 1.4rem;
-    margin-left: 20px;
-    margin-right: 0;
-    margin-top: 0;
-    letter-spacing: 0.1rem;
-    word-spacing: 0.1rem;
-  }
-  .quote-author {
-    display: inline-block;
-    font-style: normal;
-  }
+  font-family: $quote-font;
+  font-style: italic;
+  line-height: 2em;
+  font-size: 1.4rem;
+  margin-left: 20px;
+  margin-right: 0;
+  margin-top: 0;
+  letter-spacing: 0.1rem;
+  word-spacing: 0.1rem;
+}
+.quote-author {
+  display: inline-block;
+  font-style: normal;
+}
+.newsletter-box {
+  width: 100%;
+  padding: 5px;
+}
+.newsletter-box p {
+  text-align: center;
+}
+.newsletter-box label p {
+  text-align: left;
+  margin-bottom: 0;
+}
+.newsletter-box label {
+  height: 50px;
+}
+#newsletter-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+
+#newsletter-form input[type='submit'] {
+  border: 1px solid $primary-color;
+  width: 100px;
+  height: 50px;
+  margin: 10px auto 10px auto;
+  background-color: $background-color;
+  color: $primary-color;
+  border-radius: 10px 10px;
+}

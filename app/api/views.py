@@ -1,17 +1,12 @@
 from datetime import datetime
 from flask import render_template, request, url_for, redirect, flash, jsonify, abort
 import flask_praetorian
-
+from time import sleep
 from . import api
 # from .utils.to_json import node_to_json
 from .. import db, guard
 from ..models import User, Quote, Post, Node, Resource, Video
 from ..app_mail import send_email
-
-
-@api.route('/next-post/<date>')
-def next_post(date=datetime.utcnow):
-    pass
 
 
 @api.route('/qt-data')
@@ -22,9 +17,16 @@ def qt_data():
 @api.route('/vt-data')
 def vt_data():
     nodes = Node.to_dict()
-    print(f'vt_data is returning {nodes}')
+    # sleep(10)
     return nodes
 
+@api.route('/get-node', methods=['GET'])
+def get_node():
+    return Node.get_alt_term(None)
+
+@api.route('/get-node-<id>', methods=['GET'])
+def get_node_by_id(id):
+    return Node.get_alt_term(id)
 
 #############################
 

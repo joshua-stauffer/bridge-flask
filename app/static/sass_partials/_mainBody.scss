@@ -21,9 +21,14 @@ main {
   
   .details-container {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: space-between;
     margin: 0;
+  }
+  @media screen and (min-width: $breakpoint) {
+    .details-container {
+      flex-direction: row;
+    }
   }
   .item-link {
     color: $accent-contrast-dark;
@@ -41,3 +46,12 @@ main {
   
 }
 
+// alt thesaurus list details
+main .alt-thesaurus-list li {
+  list-style: none;
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+main .alt-thesaurus-list li a {
+  font-size: 2rem;
+}

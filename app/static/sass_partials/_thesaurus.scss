@@ -1,56 +1,93 @@
-.Main {
-  display: grid;
-  grid-template-columns: 3fr 1fr;
-  grid-template-rows: 80vh;
-  grid-template-areas: "main sidebar";
+#react-root {
+  min-height: 100%;
+  margin-top: 20px;
 }
+.spinner-box {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  border: 1px solid $dark;
+}
+.spinner-box p {
+  margin-top: 100px;
+}
+.spinner-box .spinner {
+  height: 40px;
+  width: 40px;
+  animation: spinner 1s infinite linear;
+  border: none;
+}
+@keyframes spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(359deg);
+  }
+}
+
+// d3
 .container {
   grid-area: main;
-}
-.sidebar {
-  grid-area: sidebar;
-}
-
-@media screen and (max-width: 600px) {
-  .Main {
-    grid-template-columns: 1fr;
-    grid-template-rows: 50vh;
-    grid-template-areas: "main"
-                          "sidebar";
-  }
-  .container {
-    height: auto;
-  }
-
-}
-
-.Main {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 20px;
-}
-
-.container {
   grid-column: 1;
   width: 100%;
   padding: 0;
   margin: 0;
-  height: 600px;
   position: relative;
+  background-color: #b8b8b8;
 }
-
 .container svg {
   display: block;
   width: 100%;
   height: 100%;
   border: solid 1px black;
 }
+.sidebar {
+  grid-area: sidebar;
+}
+
+// mobile rules
+@media screen and (max-width: $breakpoint) {
+  .App {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    grid-template-areas: "main"
+                         "sidebar";
+  }
+  .container {
+    height: auto;
+    height: 400px;
+  }
+  .App .sidebar {
+    grid-column: 1;
+    height: 400px;
+  }
+}
+
+// desktop rules
+@media screen and (min-width: $breakpoint) {
+  .App {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    grid-template-rows: 80vh;
+    grid-template-areas: "main sidebar";
+  }
+  .container {
+    grid-column: 1;
+    height: 600px;
+  }
+  .sidebar {
+    grid-column: 2;
+    height: 600px;
+  }
+}
 
 // sidebar
 .sidebar {
-  grid-column: 2;
   width: 100%;
-  height: 600px;
   overflow-y: scroll;
   border: solid 1px black;
   padding-right: 0;
@@ -127,4 +164,3 @@
   font-size: 1rem;
   align-self: center;
 }
-

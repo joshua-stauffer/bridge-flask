@@ -3,10 +3,10 @@ Base blueprint for flask app, returning main site functionality
 """
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for, 
-    current_app, send_from_directory
+    current_app, send_from_directory, abort
 )
 from . import forms
-from .models import Video, Post, Resource
+from .models import Video, Post, Resource, Node
 from .app_mail import send_email
 
 
@@ -21,6 +21,21 @@ def index():
 @bp.route('/visual-thesaurus')
 def visual_thesaurus():
     return render_template('thesaurus.html')
+
+
+@bp.route('/alt-thesaurus')
+def alt_thesaurus():
+    term = Node.get_alt_term(None)
+    print(f'got term, it is ', term)
+    return render_template('alt_thesaurus.html', term=term)
+
+
+@bp.route('/alt-thesaurus-<id>')
+def alt_thesaurus_by_id(id):
+    term = Node.get_alt_term(id)
+    print(f'got term, it is ', term)
+
+    return render_template('alt_thesaurus.html', term=term)
 
 
 @bp.route('/blog-<post_id>', methods=['GET'])
@@ -86,16 +101,24 @@ def contact():
         print(f'Message: {form.message.data}')
         send_email(app.config['APP_ADMIN_MAIL'], f'New Message from {form.name.data}', 'mail/contact', \
             reply_to=form.email.data, message_text=form.message.data, name=form.name.data)
-        return redirect(url_for('index'))
+        return redirect((url_for('.msg_confirm')))
 
     return render_template('contact.html', form=form, page=page)
 
-@bp.route('/newsletter-signup')
-def newsletter_signup():
-    form = forms.NewsletterForm()
-    return render_template('newsletter_form.html', form=form)
+
+@bp.route('/msg-confirm')
+def msg_confirm():
+    return render_template('msg_confirm.html')
 
 
 @bp.route('/dashboard')
 def dashboard():
     return render_template('dashboard.html')
+
+@bp.app_errorhandler(404)
+def not_found(e):
+    return render_template('404.html')
+
+@bp.app_errorhandler(500)
+def internal_server_error(e):
+    return render_template('500.html')

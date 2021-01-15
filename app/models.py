@@ -494,6 +494,7 @@ class Node(db.Model):
     definition = db.Column(db.Text(), nullable=True, default='')
     example = db.Column(db.Text(), nullable=True, default='')
     published = db.Column(db.Boolean, default=False)
+    order = db.Column(db.Integer)
 
     _synonyms = db.Column(db.Text(), nullable=True)
     _antonyms = db.Column(db.Text(), nullable=True)
@@ -562,6 +563,34 @@ class Node(db.Model):
 
     def __repr__(self):
         return f'{self.title}\nSynonyms: {self.synonyms}\nAntonyms: {self.antonyms}'
+
+    # alt thesaurus api
+    @classmethod
+    def get_alt_term(cls, id):
+        if not id:
+            nodes = cls.query \
+                .filter_by(published=True) \
+                .order_by(cls.order) \
+                .all()
+            # take the one with the lowest order
+            node = nodes[0]
+        else:
+            node = cls.query.filter_by(id=id).first_or_404()
+
+        all_nodes = cls.query.filter_by(published=True).all()
+        node_dict = {n.title: n.id for n in all_nodes}
+
+        return {           
+            'id': node.id,
+            'title': node.title,
+            'text': node.text,
+            'example': node.example,
+            'published': node.published,
+            'synonyms': [(n, node_dict.get(n, None)) for n in node.synonyms],
+            'antonyms': [(n, node_dict.get(n, None)) for n in node.antonyms]
+        }
+
+
 
     # create text property so api is consistent
     @property

@@ -1,21 +1,16 @@
 /* navbar style */
+
+// mobile rules first
 nav {
-  margin-top: 30px;
-  margin-bottom: 30px;
   border-top: solid 2px $primary-color;
   border-bottom: solid 2px $primary-color;
 }
+// this is the list folded up
 nav ul {
+  padding-left: 0;
   display: flex;
-  flex-direction: row;
-  padding: 0;
-  margin: 0;
-  height: auto;
-}
-nav li {
-  flex: 1;
-  flex-grow: 1;
-  list-style: none;
+  flex-direction: column;
+  align-content: flex-start;
 }
 nav a {
   display: inline-block;
@@ -28,13 +23,33 @@ nav a {
   text-transform: uppercase;
   letter-spacing: 0.2rem;
 }
-nav li:hover {
-  background-color: $primary-color;
-  a {
-    color: $background-color;
-  }
+nav .folded {
+  height: 40px;
+  overflow: hidden;
+  padding-left: 0;
 }
 
+.hamburger {
+  align-self: flex-start;
+  height: 40px;
+  width: 40px;
+  color: $primary-color;
+}
+.hamburger-button {
+  height: 42px;
+  width: 42px;
+  padding: 0;
+  margin: 0;
+  background-color: $background-color;
+  border: none;
+}
+.hamburger-button:active svg{
+  height: 50px;
+  width: 50px;
+}
+nav li {
+  list-style: none;
+}
 // which page are we on?
 nav .active {
   background-color: $primary-color;
@@ -42,3 +57,34 @@ nav .active {
     color: $background-color;
   }
 }
+
+// desktop or tablet screens
+@media (min-width: $breakpoint) {
+  .hamburger-holder {
+    display: none;
+  }
+  nav {
+    margin-top: 30px;
+    margin-bottom: 30px;
+  }
+  nav ul {
+    display: flex;
+    flex-direction: row;
+    padding: 0;
+    margin: 0;
+    height: auto;
+  }
+  nav li {
+    flex: 1;
+    flex-grow: 1;
+    list-style: none;
+  }
+
+  nav li:hover {
+    background-color: $primary-color;
+    a {
+      color: $background-color;
+    }
+  }
+}
+

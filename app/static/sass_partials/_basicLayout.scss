@@ -4,6 +4,7 @@ body {
     max-width: 1200px;
     padding: 2.5%;
     background-color: $background-color;
+    margin: 0 auto 0 auto;
   }
   
   /* grid area settings */
@@ -12,3 +13,7 @@ body {
   main {grid-area: main;}
   aside {grid-area: sidebar;}
   footer {grid-area: footer;}
+  #react-root {
+    grid-row: 3;
+    grid-column: 1/3;
+  }

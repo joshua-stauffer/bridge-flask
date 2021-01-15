@@ -1,5 +1,11 @@
 <nav>
-    <ul class="navbar-list">
+    <ul class="navbar-list folded" id="menu">
+      <li class="hamburger-holder">
+        <button class="hamburger-button" id="toggle-menu">
+          <img class="hamburger" src="{{ url_for('static', filename='images/icons/menu-bar.svg') }}">
+        </button>
+      </li>
+      
       <li {% if page == 'home' %}class="active"{% endif %}>
         <a href="{{ url_for('main.index') }}">Home</a>
       </li>
