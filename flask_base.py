@@ -1,4 +1,5 @@
 import os
+from flask_migrate import Migrate, upgrade
 from app import create_app, db
 from app.models import User, Post, PostContents, Quote, Node, Video, Resource
 
@@ -12,6 +13,7 @@ else:
     print('Unable to load environmental variables')
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
+migrate = Migrate(app, db)
 
 @app.cli.command()
 def test():
@@ -27,3 +29,10 @@ def make_shell_context():
         db=db, Node=Node, Post=Post, PostContents=PostContents,
         User=User, Quote=Quote, Video=Video, Resource=Resource
     )
+
+@app.cli.command()
+def deploy():
+    """deployment tasks"""
+    
+    #upgrade database to latest version
+    upgrade()

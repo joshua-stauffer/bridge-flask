@@ -26,28 +26,24 @@ def visual_thesaurus():
 @bp.route('/alt-thesaurus')
 def alt_thesaurus():
     term = Node.get_alt_term(None)
-    print(f'got term, it is ', term)
-    return render_template('alt_thesaurus.html', term=term)
+    page = 'thesaurus'
+    return render_template('alt_thesaurus.html', term=term, page=page)
 
 
 @bp.route('/alt-thesaurus-<id>')
 def alt_thesaurus_by_id(id):
     term = Node.get_alt_term(id)
-    print(f'got term, it is ', term)
-
-    return render_template('alt_thesaurus.html', term=term)
+    page = 'thesaurus'
+    return render_template('alt_thesaurus.html', term=term, page=page)
 
 
 @bp.route('/blog-<post_id>', methods=['GET'])
 def blog(post_id):
     page = 'blog'
-    print('got post id ', post_id)
     if post_id == '0':
         response = Post.get_most_recent()
     else:
         response = Post.get_by_id(post_id)
-
-    print('content is: ', response.content)
 
     return render_template(
             'blog.html', 

@@ -5,7 +5,6 @@ from flask import current_app, request, url_for, abort
 from . import db, guard
 
 from .utils.blog_tuple import BlogResponse
-from .utils.constants import empty_blog_error, empty_resources_error, empty_video_error
 from .utils.get_preview_text import get_preview_text
 from .utils.prettify_date import prettify_date
 from .utils.to_json import node_to_json
@@ -68,17 +67,29 @@ class Quote(db.Model):
     author = db.Column(db.String(128), nullable=True, default='')
     text = db.Column(db.Text, nullable=True, default='')
     published = db.Column(db.Boolean, default=False)
+    order = db.Column(db.Integer)
 
     def to_json(self):
         return {
             'id': self.id,
             'author': self.author,
             'text': self.text,
-            'published': self.published
+            'published': self.published,
+            'order': self.order
         }
 
     def __repr__(self):
         return f'"{self.text}" \n-{self.author}'
+
+    @classmethod
+    def to_dict_list(cls):
+        return [
+            {'author': q.author, 'text': q.text, 'id': q.id}
+            for q in cls.query \
+                .filter_by(published=True) \
+                .order_by(cls.order)
+                .all()
+        ]
 
     # dashboard api methods
     @classmethod
@@ -88,7 +99,8 @@ class Quote(db.Model):
                 'primary': q.author, 
                 'secondary': get_preview_text(q.text, 50),
                 'id': q.id,
-                'published': q.published
+                'published': q.published,
+                'order': q.order
             } for q in cls.query.all()]
 
     @classmethod
@@ -97,9 +109,22 @@ class Quote(db.Model):
         return quote.to_json()
 
     @classmethod
+    def get_by_order(cls, order):
+        quote = cls.query.filter_by(order=order).first_or_404()
+        return quote.to_json()
+
+    @classmethod
     def delete(cls, id):
         quote = cls.query.filter_by(id=id).first_or_404()
+        order = quote.order
+        quotes = [
+            r for r in cls.query.all()
+            if r.id != id and r.order > order
+        ]
+        for r in quotes:
+            r.order -= 1
         db.session.delete(quote)
+        db.session.add_all(quotes)
         db.session.commit()
 
     @classmethod
@@ -121,10 +146,8 @@ class Quote(db.Model):
     def update_batch(cls, data):
         edited_quotes = list()
         for d in data:
-            quote = cls.query.filter_by(id=d.id).first_or_404()
-            quote.text = d['text']
-            quote.author = d['author']
-            quote.published = d['published']
+            quote = cls.query.filter_by(id=d['id']).first_or_404()
+            quote.order = d['order']
             edited_quotes.append(quote)
 
         db.session.add_all(edited_quotes)
@@ -136,71 +159,16 @@ class Quote(db.Model):
         db.session.add(quote)
         db.session.commit()
 
-
     @classmethod
-    def to_dict_list(cls):
-        return [
-            {'author': q.author, 'text': q.text, 'id': q.id}
-            for q in cls.query.filter_by(published=True).all()
-        ]
-""" 
-
-    # old API access point
-
-
-    @classmethod
-    def get_edit_list(cls):
-        return [
-            {
-                'secondary': q.author, 
-                'primary': get_preview_text(q.text, 50),
-                'id': q.id,
-                'published': q.published
-            } for q in cls.query.all()
-        ]
-
-    @classmethod
-    def get_by_id(cls, id):
-        quote = cls.query.filter_by(id=id).first_or_404()
-        return {
-            'id': quote.id,
-            'text': quote.text,
-            'author': quote.author,
-            'published': quote.published
-        }
-
-    @classmethod
-    def get_new(cls):
-        new_quote = cls()
-        db.session.add(new_quote)
+    def new_by_order(cls, order_id):
+        order = int(order_id)
+        cur_quotes = cls.query.all()
+        for q in cur_quotes:
+            if q.order >= order:
+                q.order += 1
+        new_quote = cls(order=order)
+        db.session.add_all([*cur_quotes, new_quote])
         db.session.commit()
-        return {
-            'id': new_quote.id,
-            'text': new_quote.text,
-            'author': new_quote.author,
-            'published': new_quote.published
-        }
-
-    @classmethod
-    def delete(cls, id):
-        quote = cls.query.filter_by(id=id).first_or_404()
-        db.session.delete(quote)
-        db.session.commit()
-
-    @classmethod
-    def save(cls, data):
-        quote = cls.query.filter_by(id=data['id']).first_or_404()
-        quote.published = data['published']
-        quote.author = data['author']
-        quote.text = data['text']
-        db.session.add(quote)
-        db.session.commit()
-        return {
-            'id': quote.id,
-            'text': quote.text,
-            'author': quote.author,
-            'published': quote.published }
- """       
 
 
 class Post(db.Model):
@@ -258,12 +226,12 @@ class Post(db.Model):
                 }
                 for p in cls.query \
                     .filter_by(published=True) \
-                    .order_by(cls.date_created).all()
+                    .order_by(cls.date_created) \
+                    .all()
             ]
 
     @classmethod
     def get_all_published_posts(cls):
-        # This should maybe just return titles and links (ids)
         posts = cls.query \
                     .filter_by(published=True) \
                     .order_by(Post.date_created) \
@@ -274,9 +242,11 @@ class Post(db.Model):
     def get_most_recent(cls):
         print('entered get most recent')
         
-        posts = cls.query.order_by(Post.date_created).all()
+        posts = cls.query \
+            .filter_by(published=True) \
+            .order_by(Post.date_created).all()
         if not posts:
-            content = empty_blog_error
+            content = None
             metadata = None
             prev_post_id = None
         else:
@@ -298,6 +268,8 @@ class Post(db.Model):
     @classmethod
     def get_by_id(cls, id):
         post = cls.query.filter_by(id=id).first_or_404()
+        if not post.published:
+            abort(404)
         post_id_by_date = [p.id for p in cls.query.order_by(Post.date_created).all()]
         print(f' all posts: {post_id_by_date}')
         post_index = post_id_by_date.index(int(id))
@@ -329,6 +301,7 @@ class Post(db.Model):
             'date_created': self.date_created,
             'date_updated': self.date_updated,
             'published': self.published,
+            'order': self.order,
             'contents': [c.to_json() for c in blog_contents]
         }
 
@@ -352,7 +325,15 @@ class Post(db.Model):
     @classmethod
     def delete(cls, id):
         post = cls.query.filter_by(id=id).first_or_404()
+        order = post.order
+        posts = [
+            r for r in cls.query.all()
+            if r.id != id and r.order > order
+        ]
+        for r in posts:
+            r.order -= 1
         db.session.delete(post)
+        db.session.add_all(posts)
         db.session.commit()
 
     @classmethod
@@ -386,10 +367,21 @@ class Post(db.Model):
         db.session.commit()
 
     @classmethod
-    def new(cls):
+    def new(cls, user_id):
         order = len(cls.query.all())
-        post = cls(order=order, author_id=1)
+        post = cls(order=order, author_id=user_id)
         db.session.add(post)
+        db.session.commit()
+
+    @classmethod
+    def new_by_order(cls, order_id, user_id):
+        order = int(order_id)
+        cur_posts = cls.query.all()
+        for r in cur_posts:
+            if r.order >= order:
+                r.order += 1
+        new_post = cls(order=order, author_id=user_id)
+        db.session.add_all([*cur_posts, new_post])
         db.session.commit()
 
 
@@ -611,14 +603,18 @@ class Node(db.Model):
             'published': self.published,
             'synonyms': self.synonyms,
             'antonyms': self.antonyms,
-            'word_list': word_list
+            'word_list': word_list,
+            'order': self.order
         }
 
     # API access point
     @classmethod
     def to_dict(cls):
         """Returns a dictionary of all available Node data."""
-        data = cls.query.filter_by(published=True).all()
+        data = cls.query \
+            .filter_by(published=True) \
+            .order_by(cls.order) \
+            .all()
         return {d.title: node_to_json(d) for d in data}
 
     # dashboard api methods
@@ -629,18 +625,29 @@ class Node(db.Model):
                 'primary': d.title, 
                 'secondary': get_preview_text(d.text, 50),
                 'id': d.id,
-                'published': d.published
+                'published': d.published,
+                'order': d.order
             } for d in cls.query.all()]
 
     @classmethod
     def get_by_id(cls, id):
-        node = cls.query.filter_by(id=id).first_or_404()
+        node = cls.query \
+            filter_by(id=id) \
+            .first_or_404()
         return node.to_json()
 
     @classmethod
     def delete(cls, id):
         node = cls.query.filter_by(id=id).first_or_404()
+        order = node.order
+        nodes = [
+            r for r in cls.query.all()
+            if r.id != id and r.order > order
+        ]
+        for r in nodes:
+            r.order -= 1
         db.session.delete(node)
+        db.session.add_all(nodes)
         db.session.commit()
 
     @classmethod
@@ -666,13 +673,8 @@ class Node(db.Model):
     def update_batch(cls, data):
         edited_nodes = list()
         for d in data:
-            node = cls.query.filter_by(id=d.id).first_or_404()
-            node.title = data['title']
-            node.text = data['text']
-            node.published = data['published']
-            node.example = data['example']
-            node.synonyms = data['synonyms']
-            node.antonyms = data['antonyms']
+            node = cls.query.filter_by(id=d['id']).first_or_404()
+            node.order = data['order']
             edited_nodes.append(node)
 
         db.session.add_all(edited_nodes)
@@ -680,8 +682,20 @@ class Node(db.Model):
 
     @classmethod
     def new(cls):
-        node = cls()
+        order = len(cls.query.all())
+        node = cls(order=order)
         db.session.add(node)
+        db.session.commit()
+
+    @classmethod
+    def new_by_order(cls, order_id):
+        order = int(order_id)
+        cur_nodes = cls.query.all()
+        for r in cur_nodes:
+            if r.order >= order:
+                r.order += 1
+        new_node = cls(order=order)
+        db.session.add_all([*cur_nodes, new_node])
         db.session.commit()
 
     @classmethod
@@ -721,6 +735,8 @@ class Video(db.Model):
             .filter_by(published=True) \
             .order_by(Video.order) \
             .all()
+        if not len(video_list):
+            return None
         return [video.to_json() for video in video_list]
 
 
@@ -744,7 +760,15 @@ class Video(db.Model):
     @classmethod
     def delete(cls, id):
         video = cls.query.filter_by(id=id).first_or_404()
+        order = video.order
+        videos = [
+            r for r in cls.query.all()
+            if r.id != id and r.order > order
+        ]
+        for r in videos:
+            r.order -= 1
         db.session.delete(video)
+        db.session.add_all(videos)
         db.session.commit()
 
     @classmethod
@@ -784,14 +808,14 @@ class Video(db.Model):
         db.session.commit()
 
 
-
     @classmethod
     def new_by_order(cls, order_id):
+        order = int(order_id)
         cur_videos = cls.query.all()
         for r in cur_videos:
-            if r.order >= order_id:
+            if r.order >= order:
                 r.order += 1
-        new_video = cls(order=order_id)
+        new_video = cls(order=order)
         db.session.add_all([*cur_videos, new_video])
         db.session.commit()
 
@@ -826,10 +850,13 @@ class Resource(db.Model):
             'order': r.order,
             'uri': r.uri,
             'uri_title': r.uri_title
-        } for r in cls.query.filter_by(published=True).order_by(Resource.order).all()]
+        } for r in cls.query \
+                .filter_by(published=True) \
+                .order_by(Resource.order) \
+                .all()]
 
         if not len(results):
-            return [empty_resources_error]
+            return None
         return results
 
     # dashboard api methods

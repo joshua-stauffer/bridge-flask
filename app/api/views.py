@@ -4,7 +4,7 @@ import flask_praetorian
 from time import sleep
 from . import api
 # from .utils.to_json import node_to_json
-from .. import db, guard
+from .. import db, guard, limiter
 from ..models import User, Quote, Post, Node, Resource, Video
 from ..app_mail import send_email
 
@@ -17,7 +17,6 @@ def qt_data():
 @api.route('/vt-data')
 def vt_data():
     nodes = Node.to_dict()
-    # sleep(10)
     return nodes
 
 @api.route('/get-node', methods=['GET'])
@@ -31,6 +30,7 @@ def get_node_by_id(id):
 #############################
 
 @api.route('/login', methods=['POST'])
+@limiter.limit("3/minute;40/hour")
 def login():
     r = request.get_json(force=True)
     username = r.get('username', None)
@@ -40,15 +40,14 @@ def login():
     return response
 
 
-@api.route('/quotes', methods=['GET', 'PUT', 'POST'])
+@api.route('/quotes', methods=['GET', 'PATCH', 'POST'])
 @flask_praetorian.auth_required
 def gen_quotes():
 
     if request.method == 'GET':
         pass
 
-    #TODO: is this code needed?
-    elif request.method == 'PUT':
+    elif request.method == 'PATCH':
         data = request.get_json()
         Quote.update_batch(data)
 
@@ -58,7 +57,7 @@ def gen_quotes():
     return jsonify(Quote.get_all_private())
 
 
-@api.route('/quotes-<id>', methods=['GET', 'PUT', 'DELETE'])
+@api.route('/quotes-<id>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 @flask_praetorian.auth_required
 def sp_quotes(id):
 
@@ -71,6 +70,10 @@ def sp_quotes(id):
         print('got json data request: ', data)
         new_quote = Quote.update_by_id(id, data)
         return new_quote
+
+    elif request.method == 'POST':
+        # in this case, the id passed is actually order
+        Quote.new_by_order(id)
 
     elif request.method == 'DELETE':
         Quote.delete(id)
@@ -152,7 +155,6 @@ def sp_videos(id):
         return new_video
         
     elif request.method == 'POST':
-        # in this case, the id is actually the index where we want to place the new element
         Video.new_by_order(id)
 
     elif request.method == 'DELETE':
@@ -164,6 +166,7 @@ def sp_videos(id):
 @api.route('/blog', methods=['GET', 'PATCH', 'POST'])
 @flask_praetorian.auth_required
 def gen_blog():
+    user_id = flask_praetorian.current_user_id()
     
     if request.method == 'GET':
         pass
@@ -173,7 +176,7 @@ def gen_blog():
         Post.update_batch(data)
 
     elif request.method == 'POST':
-        Post.new()
+        Post.new(user_id)
     
     return jsonify(Post.get_all_private())
 
@@ -181,7 +184,8 @@ def gen_blog():
 @api.route('/blog-<id>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 @flask_praetorian.auth_required
 def sp_blog(id):
-    
+    user_id = flask_praetorian.current_user_id()
+ 
     if request.method == 'GET':
         return Post.get_by_id_private(id)
     
@@ -193,8 +197,7 @@ def sp_blog(id):
         return new_Post
         
     elif request.method == 'POST':
-        # in this case, the id is actually the index where we want to place the new element
-        Post.new_by_order(id)
+        Post.new_by_order(id, user_id)
 
     elif request.method == 'DELETE':
         Post.delete(id)
@@ -202,7 +205,7 @@ def sp_blog(id):
     return jsonify(Post.get_all_private())
 
 
-@api.route('/thesaurus', methods=['GET', 'PUT', 'POST'])
+@api.route('/thesaurus', methods=['GET', 'PATCH', 'POST'])
 @flask_praetorian.auth_required
 def gen_thesaurus():
     print('entered gen_thesaurus with the method ', request.method)
@@ -210,11 +213,10 @@ def gen_thesaurus():
     if request.method == 'GET':
         pass
 
-    #TODO: is this code needed?
-    elif request.method == 'PUT':
+    elif request.method == 'PATCH':
         data = request.get_json()
-        print('found arguments in gen_thesaurus: ', data)
         Node.update_batch(data)
+
 
     elif request.method == 'POST':
         Node.new()
@@ -222,7 +224,7 @@ def gen_thesaurus():
     return jsonify(Node.get_all_private())
 
 
-@api.route('/thesaurus-<id>', methods=['GET', 'PUT', 'DELETE'])
+@api.route('/thesaurus-<id>', methods=['GET', 'PUT', 'POST', 'DELETE'])
 @flask_praetorian.auth_required
 def sp_thesaurus(id):
     print('got quote with id ', id)
@@ -236,6 +238,10 @@ def sp_thesaurus(id):
         print('got json data request: ', data)
         new_node = Node.update_by_id(id, data)
         return new_node
+
+    elif request.method == 'POST':
+        # in this case, the id passed is actually order
+        Node.new_by_order(id)
 
     elif request.method == 'DELETE':
         Node.delete(id)

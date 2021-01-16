@@ -6,12 +6,14 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
 from flask_praetorian import Praetorian
 from flask_cors import CORS
-
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 mail = Mail()
 migrate = Migrate()
 guard = Praetorian()
 cors = CORS()
+limiter = Limiter(key_func=get_remote_address)
 
 # create naming convention for Alembic migrations
 # as per Flask docs: https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/#using-custom-metadata-and-naming-conventions
@@ -39,6 +41,8 @@ def create_app(config_name):
     from .models import User
     guard.init_app(app, User)
     cors.init_app(app)
+
+    limiter.init_app(app)
 
     # set render_as_batch=True to fix sqlite migration issues
     # as per Miguel: https://youtu.be/wpRVZFwsD70
