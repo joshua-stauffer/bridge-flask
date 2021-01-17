@@ -1,3 +1,4 @@
+import logging
 from flask import Flask
 from flask_mail import Mail
 from flask_migrate import Migrate
@@ -30,10 +31,10 @@ db = SQLAlchemy(metadata=metadata)
 
 
 def create_app(config_name):
+    logging.basicConfig(filename='test.log', level=logging.DEBUG)
+
     app = Flask(__name__)
     app.config.from_object(config[config_name])
-    # print('just configured app')
-    print(app)
 
     mail.init_app(app)
     db.init_app(app)
