@@ -12,11 +12,14 @@ class Config:
     MAIL_SENDER = os.environ.get('MAIL_SENDER') 
     APP_ADMIN_MAIL = os.environ.get('APP_ADMIN_MAIL')
     SSL_REDIRECT = False
+    SQLALCHEMY_DATABASE_URI=os.environ.get('DATABASE_URI') or \
+            'sqlite:///' + os.path.join(basedir, 'app.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_RECORD_QUERIES = True
     SLOW_DB_QUERY_TIME = 0.5
     JWT_ACCESS_LIFESPAN = {"hours": 24}
     JWT_REFRESH_LIFESPAN = {"days": 3}
+    LOG_TO_STDOUT = os.environ.get('LOG_TO_STDOUT')
 
     @staticmethod
     def init_app(app):

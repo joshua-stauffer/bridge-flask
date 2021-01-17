@@ -21,7 +21,7 @@ class User(db.Model):
     username = db.Column(db.String(32), index=True, nullable=False)
     first_name = db.Column(db.String(64))
     last_name = db.Column(db.String(64))
-    password_hash = db.Column(db.String(128))
+    password_hash = db.Column(db.String(256))
     confirmed = db.Column(db.Boolean, default=False)
     posts = db.relationship('Post', backref='user')
     roles = db.Column(db.String(64))
@@ -632,7 +632,7 @@ class Node(db.Model):
     @classmethod
     def get_by_id(cls, id):
         node = cls.query \
-            filter_by(id=id) \
+            .filter_by(id=id) \
             .first_or_404()
         return node.to_json()
 
