@@ -31,7 +31,11 @@ db = SQLAlchemy(metadata=metadata)
 
 
 def create_app(config_name):
-    logging.basicConfig(filename='test.log', level=logging.DEBUG)
+    logging.basicConfig(
+        filename='test.log',
+        level=logging.DEBUG,
+        format='%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s'
+    )
 
     app = Flask(__name__)
     app.config.from_object(config[config_name])
