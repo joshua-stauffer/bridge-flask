@@ -21,7 +21,7 @@ class User(db.Model):
     username = db.Column(db.String(32), index=True, nullable=False)
     first_name = db.Column(db.String(64))
     last_name = db.Column(db.String(64))
-    password_hash = db.Column(db.String(256))
+    password_hash = db.Column(db.Text)
     confirmed = db.Column(db.Boolean, default=False)
     posts = db.relationship('Post', backref='user')
     roles = db.Column(db.String(64))

@@ -39,7 +39,7 @@ def upgrade():
     sa.Column('username', sa.String(length=32), nullable=False),
     sa.Column('first_name', sa.String(length=64), nullable=True),
     sa.Column('last_name', sa.String(length=64), nullable=True),
-    sa.Column('password_hash', sa.String(length=128), nullable=True),
+    sa.Column('password_hash', sa.String(length=255), nullable=True),
     sa.Column('confirmed', sa.Boolean(), nullable=True),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_users'))
     )
