@@ -43,7 +43,8 @@ def create_app(config_name):
     
 
     app = Flask(__name__)
-    app.config.from_object(config[config_name])
+    config_obj = config[config_name]()
+    app.config.from_object(config_obj)
     config[config_name].init_app(app)
     
     app.logger.info(f'inside create app env is {os.environ}')
