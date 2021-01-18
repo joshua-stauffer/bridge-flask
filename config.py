@@ -39,23 +39,16 @@ class TestingConfig(Config):
     WTF_CSRF_ENABLED = False
 
 class ProductionConfig(Config):
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')# or \
-        #'sqlite:///' + os.path.join(basedir, 'data.sqlite')
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
 
     @classmethod
     def init_app(cls, app):
-
         Config.init_app(app)
-        #app.logger.info(f"_________After running Config the object is: {app.config}")
-        app.logger.info(f"just for fun.. the uri in env is {os.environ.get('DATABASE_URL')}")
-        app.logger.info(f"but the url in config is: {cls.SQLALCHEMY_DATABASE_URI}")
-        app.logger.info(f"here is the class itself: {cls.__dict__}")
 
 
 config = {
     'development': DevelopmentConfig,
     'testing': TestingConfig,
     'production': ProductionConfig,
-
     'default': DevelopmentConfig
 }

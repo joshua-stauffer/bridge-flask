@@ -1,5 +1,7 @@
-import logging
 import os
+import logging
+from logging.handlers import RotatingFileHandler
+
 from flask import Flask
 from flask_mail import Mail
 from flask_migrate import Migrate
@@ -31,33 +33,11 @@ metadata = MetaData(naming_convention=convention)
 db = SQLAlchemy(metadata=metadata)
 
 
-
-
 def create_app(config_name):
     
-    logging.basicConfig(
-        filename='gunicorn.log',
-        level=logging.DEBUG,
-        format='%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s'
-    )
-    
-
     app = Flask(__name__)
-    config_obj = config[config_name]()
-    app.config.from_object(config_obj)
+    app.config.from_object(config[config_name])
     config[config_name].init_app(app)
-    
-    app.logger.info(f'inside create app env is {os.environ}')
-    app.logger.info(f'and database url using os.getenv: {os.getenv("DATABASE_URL")}')
-    app.logger.info(f'and now via os.environ.get: {os.environ.get("DATABASE_URL")}')
-
-    # set up gunicorn logging
-    gunicorn_logger = logging.getLogger('gunicorn.error')
-    app.logger.handlers = gunicorn_logger.handlers
-    app.logger.setLevel(logging.DEBUG)
-    app.logger.info('created app!')
-    app.logger.info(f"database connection is: {app.config['SQLALCHEMY_DATABASE_URI']}")
-    app.logger.info(f"okay, env variables? {app.config['SECRET_KEY']}")
 
     mail.init_app(app)
     db.init_app(app)
@@ -86,5 +66,18 @@ def create_app(config_name):
 
     from .api import api as api_blueprint
     app.register_blueprint(api_blueprint, url_prefix='/api')
+
+    # set up logging
+    if not os.path.exists('logs'):
+        os.mkdir('logs')
+    file_handler = RotatingFileHandler('logs/bridge.log',
+                    maxBytes=10240, backupCount=10)
+    file_handler.setFormatter(logging.Formatter(
+                '%(asctime)s %(levelname)s: %(message)s '
+                '[in %(pathname)s:%(lineno)d]'))
+    file_handler.setLevel(logging.INFO)
+    app.logger.addHandler(file_handler)
+    app.logger.setLevel(logging.INFO)
+    app.logger.info('Flask App startup')
 
     return app
