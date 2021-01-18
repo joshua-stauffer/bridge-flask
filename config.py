@@ -8,8 +8,9 @@ class Config:
     MAIL_SERVER = os.environ.get('MAIL_SERVER', 'smtp.googlemail.com')
     MAIL_PORT = int(os.environ.get('MAIL_PORT', '587'))
     MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS', 'true').lower() in ['true', 'on', '1']
-    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
-    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+    MAIL_USERNAME = 'apikey'
+    MAIL_PASSWORD = os.environ.get('SENDGRID_API_KEY')
+    MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER')
     MAIL_SUBJECT_PREFIX = '[Website Message]: '
     MAIL_SENDER = os.environ.get('MAIL_SENDER') 
     APP_ADMIN_MAIL = os.environ.get('APP_ADMIN_MAIL')

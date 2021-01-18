@@ -22,3 +22,5 @@ build/
 *.sqlite
 certs/
 *.log
+.env.swp
+logs/

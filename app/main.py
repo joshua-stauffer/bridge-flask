@@ -91,11 +91,8 @@ def contact():
     if request.method == 'POST' and form.validate_on_submit():
         app = current_app
 
-        print('Form was Submitted!')
-        print(f'Name: {form.name.data}')
-        print(f'Email: {form.email.data}')
-        print(f'Message: {form.message.data}')
-        send_email(app.config['APP_ADMIN_MAIL'], f'New Message from {form.name.data}', 'mail/contact', \
+        app.logger.info(f'Form was submitted: Name {form.name.data} Email {form.email.data} Message {form.message.data}')
+        send_email(app.config['MAIL_DEFAULT_SENDER'], f'New Message from {form.name.data}', 'mail/contact', \
             reply_to=form.email.data, message_text=form.message.data, name=form.name.data)
         return redirect((url_for('.msg_confirm')))
 
