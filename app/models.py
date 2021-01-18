@@ -564,6 +564,7 @@ class Node(db.Model):
                 .filter_by(published=True) \
                 .order_by(cls.order) \
                 .all()
+            if not nodes: return None
             # take the one with the lowest order
             node = nodes[0]
         else:

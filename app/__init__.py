@@ -1,4 +1,5 @@
 import logging
+import os
 from flask import Flask
 from flask_mail import Mail
 from flask_migrate import Migrate
@@ -33,19 +34,28 @@ db = SQLAlchemy(metadata=metadata)
 
 
 def create_app(config_name):
+    
     logging.basicConfig(
         filename='gunicorn.log',
         level=logging.DEBUG,
         format='%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s'
     )
+    
 
     app = Flask(__name__)
     app.config.from_object(config[config_name])
+    
+    app.logger.info(f'inside create app env is {os.environ}')
+    app.logger.info(f'and database url using os.getenv: {os.getenv("DATABASE_URL")}')
+    app.logger.info(f'and now via os.environ.get: {os.environ.get("DATABASE_URL")}')
 
     # set up gunicorn logging
     gunicorn_logger = logging.getLogger('gunicorn.error')
     app.logger.handlers = gunicorn_logger.handlers
     app.logger.setLevel(logging.DEBUG)
+    app.logger.info('created app!')
+    app.logger.info(f"database connection is: {app.config['SQLALCHEMY_DATABASE_URI']}")
+    app.logger.info(f"okay, env variables? {app.config['SECRET_KEY']}")
 
     mail.init_app(app)
     db.init_app(app)

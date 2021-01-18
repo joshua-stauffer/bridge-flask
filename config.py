@@ -13,7 +13,7 @@ class Config:
     APP_ADMIN_MAIL = os.environ.get('APP_ADMIN_MAIL')
     SSL_REDIRECT = False
 
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_TRACK_MODIFICATIONS = False 
     SQLALCHEMY_RECORD_QUERIES = True
     SLOW_DB_QUERY_TIME = 0.5
     JWT_ACCESS_LIFESPAN = {"hours": 24}
@@ -37,8 +37,8 @@ class TestingConfig(Config):
     WTF_CSRF_ENABLED = False
 
 class ProductionConfig(Config):
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'sqlite:///' + os.path.join(basedir, 'data.sqlite')
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')# or \
+        #'sqlite:///' + os.path.join(basedir, 'data.sqlite')
 
     @classmethod
     def init_app(cls, app):
@@ -65,7 +65,7 @@ class ProductionConfig(Config):
         app.logger.addHandler(mail_handler)
 
         syslog_handler = SysLogHandler()
-        syslog_handler.setLevel(logging.WARNING)
+        syslog_handler.setLevel(logging.DEBUG)
         app.logger.addHandler(syslog_handler)
 
 
