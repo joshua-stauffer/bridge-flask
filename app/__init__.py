@@ -30,15 +30,22 @@ metadata = MetaData(naming_convention=convention)
 db = SQLAlchemy(metadata=metadata)
 
 
+
+
 def create_app(config_name):
     logging.basicConfig(
-        filename='test.log',
+        filename='gunicorn.log',
         level=logging.DEBUG,
         format='%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s'
     )
 
     app = Flask(__name__)
     app.config.from_object(config[config_name])
+
+    # set up gunicorn logging
+    gunicorn_logger = logging.getLogger('gunicorn.error')
+    app.logger.handlers = gunicorn_logger.handlers
+    app.logger.setLevel(logging.DEBUG)
 
     mail.init_app(app)
     db.init_app(app)
