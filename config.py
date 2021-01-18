@@ -42,32 +42,12 @@ class ProductionConfig(Config):
 
     @classmethod
     def init_app(cls, app):
+
         Config.init_app(app)
-
-        import logging
-        from logging.handlers import SMTPHandler, SysLogHandler
-        credentials = None
-        secure = None
-
-        if getattr(cls, 'MAIL_USERNAME', None) is not None:
-            credentials = (cls.MAIL_USERNAME, cls.MAIL_PASSWORD)
-            if getattr(cls, 'MAIL_USE_TLS', None):
-                secure = ()
-
-        mail_handler = SMTPHandler(
-            mailhost=(cls.MAIL_SERVER, cls.MAIL_PORT),
-            fromaddr=cls.MAIL_SENDER,
-            toaddrs=[cls.APP_ADMIN_MAIL],
-            subject=cls.MAIL_SUBJECT_PREFIX + ' Application Error',
-            credentials=credentials,
-            secure=secure)
-        mail_handler.setLevel(logging.ERROR)
-        app.logger.addHandler(mail_handler)
-
-        syslog_handler = SysLogHandler()
-        syslog_handler.setLevel(logging.DEBUG)
-        app.logger.addHandler(syslog_handler)
-
+        #app.logger.info(f"_________After running Config the object is: {app.config}")
+        app.logger.info(f"just for fun.. the uri in env is {os.environ.get('DATABASE_URL')}")
+        app.logger.info(f"but the url in config is: {cls.SQLALCHEMY_DATABASE_URI}")
+        app.logger.info(f"here is the class itself: {cls.__dict__}")
 
 
 config = {

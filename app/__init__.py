@@ -44,6 +44,7 @@ def create_app(config_name):
 
     app = Flask(__name__)
     app.config.from_object(config[config_name])
+    config[config_name].init_app(app)
     
     app.logger.info(f'inside create app env is {os.environ}')
     app.logger.info(f'and database url using os.getenv: {os.getenv("DATABASE_URL")}')

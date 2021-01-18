@@ -17,7 +17,8 @@ else:
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 app.logger.info(f'got env variablesL {os.environ}')
-app.logger.info('database connection is ', app.config.get('DATABASE_URL'), None) 
+app.logger.info(f"database connection is {app.config.get('DATABASE_URL')}") 
+app.logger.info(f"app config object is {app.config}")
 migrate = Migrate(app, db)
 
 
