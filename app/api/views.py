@@ -1,5 +1,5 @@
 from datetime import datetime
-from flask import render_template, request, url_for, redirect, flash, jsonify, abort
+from flask import render_template, request, url_for, redirect, flash, jsonify, abort, current_app
 import flask_praetorian
 from time import sleep
 from . import api
@@ -36,6 +36,10 @@ def login():
     username = r.get('username', None)
     password = r.get('password', None)
     user = guard.authenticate(username, password)
+    if user:
+        current_app.logger.info(f'logged in {user}')
+    else:
+        current_app.logger.info('failed login attempt')
     response = {'access_token': guard.encode_jwt_token(user)}
     return response
 
