@@ -59,8 +59,6 @@ def create_app(config_name):
 
     from . import main
     app.register_blueprint(main.bp)
-    # urls inside of blueprints are typically given their own namespace,
-    # but in this case we want this to be the default
     app.add_url_rule('/', endpoint='index')
 
 
