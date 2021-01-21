@@ -110,7 +110,7 @@ def dashboard():
 
 @bp.app_errorhandler(404)
 def not_found(e):
-    current_app.logger.info(f'404 Error: {e}')
+    #current_app.logger.info(f'404 Error: {e}')
     return render_template('404.html')
 
 @bp.app_errorhandler(500)
