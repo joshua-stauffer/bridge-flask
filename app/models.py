@@ -226,7 +226,7 @@ class Post(db.Model):
                 }
                 for p in cls.query \
                     .filter_by(published=True) \
-                    .order_by(cls.date_created) \
+                    .order_by(cls.date_created.desc()) \
                     .all()
             ]
 
@@ -614,7 +614,6 @@ class Node(db.Model):
         """Returns a dictionary of all available Node data."""
         data = cls.query \
             .filter_by(published=True) \
-            .order_by(cls.order) \
             .all()
         return {d.title: node_to_json(d) for d in data}
 

@@ -114,6 +114,12 @@
   display: flex;
   align-items: center;
 }
+.sidebar li .select-term-button {
+  display: flex;
+  align-items: center;
+  width: 80%;
+  text-align: center;
+}
 .sidebar .active-button:focus {
   outline: none;
   border-bottom: 1px dotted grey;
@@ -132,9 +138,12 @@
 .sidebar-text, .sidebar-title {
   margin: 2% 5%;
 }
+.popup-aside {
+  padding: 10px;
+}
 
 .popup-aside .sidebar-text {
-  height: 28vh;
+  height: 25%;
   overflow-y: hidden;
 }
 

@@ -13,6 +13,7 @@ def node_to_json(data, link_1_strength=0.7, link_2_strength=0.1):
     result['title'] = data.title
     result['example'] = data.example
     result['definition'] = data.definition
+    result['order'] = data.order
     
     for s in data.synonyms:
         result['links'].append(add_link('synonym', s, link_2_strength))

@@ -8,6 +8,7 @@ from flask import (
 from . import forms
 from .models import Video, Post, Resource, Node
 from .app_mail import send_email
+from .utils.link_check import link_check
 
 
 bp = Blueprint('main', __name__)
@@ -91,10 +92,16 @@ def contact():
     if request.method == 'POST' and form.validate_on_submit():
         app = current_app
 
-        app.logger.info(f'Form was submitted: Name {form.name.data} Email {form.email.data} Message {form.message.data}')
-        send_email(app.config['MAIL_DEFAULT_SENDER'], f'New Message from {form.name.data}', 'mail/contact', \
-            reply_to=form.email.data, message_text=form.message.data, name=form.name.data)
-        return redirect((url_for('.msg_confirm')))
+        # validate that there are no links in the form submission
+        # in order to reduce spam
+        if not link_check(form.message.data):
+            app.logger.info(f'Blocked spam form submission from {form.name.data}')
+            return redirect((url_for('.msg_error')))
+        else:
+            app.logger.info(f'Form was submitted: Name {form.name.data} Email {form.email.data} Message {form.message.data}')
+            send_email(app.config['MAIL_DEFAULT_SENDER'], f'New Message from {form.name.data}', 'mail/contact', \
+                reply_to=form.email.data, message_text=form.message.data, name=form.name.data)
+            return redirect((url_for('.msg_confirm')))
 
     return render_template('contact.html', form=form, page=page)
 
@@ -102,6 +109,10 @@ def contact():
 @bp.route('/msg-confirm')
 def msg_confirm():
     return render_template('msg_confirm.html')
+
+@bp.route('/msg-error')
+def msg_error():
+    return render_template('msg_error.html')
 
 
 @bp.route('/dashboard')

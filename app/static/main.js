@@ -1,4 +1,3 @@
-import { api } from './apiEndpoints.js';
 const headers = {
   method: 'GET',
   mode: 'same-origin',
@@ -8,9 +7,10 @@ const headers = {
     'Content-Type': 'application/json'
   }
 }
-fetch(api.quote_api, headers)
+fetch("/api/qt-data", headers)
   .then(response => response.json())
   .then(data => {
+    if (!data) return;
     function changeQuote() {
       const quote = data[Math.floor(Math.random() * data.length)];
       const quoteblock = document.querySelector('.quotation');
@@ -30,3 +30,4 @@ toggleMenu.addEventListener('click', () => {
     menu.className = 'navbar-list'
     : menu.className = 'navbar-list folded'
 })
+
