@@ -674,7 +674,7 @@ class Node(db.Model):
         edited_nodes = list()
         for d in data:
             node = cls.query.filter_by(id=d['id']).first_or_404()
-            node.order = data['order']
+            node.order = d['order']
             edited_nodes.append(node)
 
         db.session.add_all(edited_nodes)
