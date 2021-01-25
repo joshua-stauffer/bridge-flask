@@ -46,6 +46,7 @@ def login():
 
 @api.route('/quotes', methods=['GET', 'PATCH', 'POST'])
 @flask_praetorian.auth_required
+@limiter.limit("1/second")
 def gen_quotes():
 
     if request.method == 'GET':
@@ -63,6 +64,7 @@ def gen_quotes():
 
 @api.route('/quotes-<id>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 @flask_praetorian.auth_required
+@limiter.limit("1/second")
 def sp_quotes(id):
 
     if request.method == 'GET':
@@ -87,6 +89,7 @@ def sp_quotes(id):
 
 @api.route('/resources', methods=['GET', 'PATCH', 'POST'])
 @flask_praetorian.auth_required
+@limiter.limit("1/second")
 def gen_resources():
     
     if request.method == 'GET':
@@ -104,6 +107,7 @@ def gen_resources():
 
 @api.route('/resources-<id>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 @flask_praetorian.auth_required
+@limiter.limit("1/second")
 def sp_resources(id):
     
     if request.method == 'GET':
@@ -129,6 +133,7 @@ def sp_resources(id):
 
 @api.route('/videos', methods=['GET', 'PATCH', 'POST'])
 @flask_praetorian.auth_required
+@limiter.limit("1/second")
 def gen_videos():
     
     if request.method == 'GET':
@@ -146,6 +151,7 @@ def gen_videos():
 
 @api.route('/videos-<id>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 @flask_praetorian.auth_required
+@limiter.limit("1/second")
 def sp_videos(id):
     
     if request.method == 'GET':
@@ -169,6 +175,7 @@ def sp_videos(id):
 
 @api.route('/blog', methods=['GET', 'PATCH', 'POST'])
 @flask_praetorian.auth_required
+@limiter.limit("1/second")
 def gen_blog():
     user_id = flask_praetorian.current_user_id()
     
@@ -187,6 +194,7 @@ def gen_blog():
 
 @api.route('/blog-<id>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 @flask_praetorian.auth_required
+@limiter.limit("1/second")
 def sp_blog(id):
     user_id = flask_praetorian.current_user_id()
  
@@ -211,6 +219,7 @@ def sp_blog(id):
 
 @api.route('/thesaurus', methods=['GET', 'PATCH', 'POST'])
 @flask_praetorian.auth_required
+@limiter.limit("1/second")
 def gen_thesaurus():
     print('entered gen_thesaurus with the method ', request.method)
 
@@ -230,6 +239,7 @@ def gen_thesaurus():
 
 @api.route('/thesaurus-<id>', methods=['GET', 'PUT', 'POST', 'DELETE'])
 @flask_praetorian.auth_required
+@limiter.limit("1/second")
 def sp_thesaurus(id):
     print('got quote with id ', id)
 

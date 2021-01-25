@@ -10,7 +10,10 @@ def get_preview_text(text, max_char_count=120):
         char = text[i]
     except IndexError:
         return text
-    while char not in stopchars:
+    while char not in stopchars and i > 0:
         i -= 1
         char = text[i]
+    # no spaces or punctuation? interrupt word at ideal length
+    if i == 0:
+        return text[:max_char_count] + '...'
     return text[:i] + '...'

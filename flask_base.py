@@ -23,3 +23,9 @@ def make_shell_context():
         User=User, Quote=Quote, Video=Video, Resource=Resource
     )
 
+@app.cli.command()
+def test():
+    """run all unittests"""
+    import unittest
+    tests = unittest.TestLoader().discover('tests')
+    unittest.TextTestRunner(verbosity=2).run(tests)

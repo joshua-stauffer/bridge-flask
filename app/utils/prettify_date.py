@@ -17,6 +17,7 @@ nd_suffix = {2, 22}
 rd_suffix = {3, 23}
 
 def prettify_date(date):
+    """Requires date as a datetime object"""
     if not date: return ''
     month = month_map[date.month]
     if date.day in st_suffix:
