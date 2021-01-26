@@ -116,13 +116,11 @@ def sp_resources(id):
     elif request.method == 'PUT':
         # must return the saved object
         data = request.get_json()
-        print('data is ', data)
         new_resource = Resource.update_by_id(id, data)
         return new_resource
         
     elif request.method == 'POST':
         # in this case, the id is actually the index where we want to place the new element
-        print(f'making new item with order {id}')
         Resource.new_by_order(id)
 
     elif request.method == 'DELETE':
@@ -160,7 +158,6 @@ def sp_videos(id):
     elif request.method == 'PUT':
         # must return the saved object
         data = request.get_json()
-        print('data is ', data)
         new_video = Video.update_by_id(id, data)
         return new_video
         
@@ -204,7 +201,6 @@ def sp_blog(id):
     elif request.method == 'PUT':
         # must return the saved object
         data = request.get_json()
-        print('data is ', data)
         new_Post = Post.update_by_id(id, data)
         return new_Post
         
@@ -241,7 +237,6 @@ def gen_thesaurus():
 @flask_praetorian.auth_required
 @limiter.limit("1/second")
 def sp_thesaurus(id):
-    print('got quote with id ', id)
 
     if request.method == 'GET':
         return Node.get_by_id(id)
@@ -249,7 +244,6 @@ def sp_thesaurus(id):
     elif request.method == 'PUT':
         # remember that this needs to return a single object!
         data = request.get_json()
-        print('got json data request: ', data)
         new_node = Node.update_by_id(id, data)
         return new_node
 
@@ -261,18 +255,3 @@ def sp_thesaurus(id):
         Node.delete(id)
         
     return jsonify(Node.get_all_private())
-
-
-"""
-get_by_id
-get_all_private
-update_by_id
-update_batch
-delete
-new
-new_by_order
-
-
-
-
-"""
