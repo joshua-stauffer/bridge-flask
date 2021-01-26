@@ -199,7 +199,7 @@ def sp_blog(id):
     user_id = flask_praetorian.current_user_id()
  
     if request.method == 'GET':
-        return Post.get_by_id_private(id)
+        return Post.get_by_id(id)
     
     elif request.method == 'PUT':
         # must return the saved object

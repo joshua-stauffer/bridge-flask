@@ -10,10 +10,6 @@ from .utils.prettify_date import prettify_date
 from .utils.to_json import node_to_json
 
 
-# relationship goes in parent
-# foreign key goes in the child class
-
-
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -61,7 +57,78 @@ class User(db.Model):
         return f'{self.first_name} {self.last_name}'
 
 
-class Quote(db.Model):
+class APIMixin:
+    """
+    Defines an API for the view to access models.
+    Requires that models have an id (int) and order (int) fields defined.
+    Individual models must define to_json, get_all_private, and update_by_id with their own logic.
+    """
+
+    def to_json(self):
+        pass
+    
+    @classmethod
+    def get_all_private(cls):
+        pass
+
+    @classmethod
+    def update_by_id(cls, id, data):
+        pass
+
+    @classmethod
+    def get_by_id(cls, id):
+        entry = cls.query.filter_by(id=id).first_or_404()
+        return entry.to_json()
+
+    @classmethod
+    def get_by_order(cls, order):
+        entry = cls.query.filter_by(order=order).first_or_404()
+        return entry.to_json()
+
+    @classmethod
+    def delete(cls, id):
+        to_del = cls.query.filter_by(id=id).first_or_404()
+        order = to_del.order
+        entries = [
+            r for r in cls.query.all()
+            if r.id != id and r.order > order
+        ]
+        for r in entries:
+            r.order -= 1
+        db.session.delete(to_del)
+        db.session.add_all(entries)
+        db.session.commit()
+
+    @classmethod
+    def update_batch(cls, data):
+        edited_entries = list()
+        for d in data:
+            entry = cls.query.filter_by(id=d['id']).first_or_404()
+            entry.order = d['order']
+            edited_entries.append(entry)
+
+        db.session.add_all(edited_entries)
+        db.session.commit()
+
+    @classmethod
+    def new(cls):
+        entry = cls()
+        db.session.add(entry)
+        db.session.commit()
+
+    @classmethod
+    def new_by_order(cls, order_id):
+        order = int(order_id)
+        current = cls.query.all()
+        for entry in current:
+            if entry.order >= order:
+                entry.order += 1
+        new_entry = cls(order=order)
+        db.session.add_all([*current, new_entry])
+        db.session.commit()
+
+
+class Quote(APIMixin, db.Model):
     __tablename__ = 'quotes'
     id = db.Column(db.Integer, primary_key=True)
     author = db.Column(db.String(128), nullable=True, default='')
@@ -104,34 +171,9 @@ class Quote(db.Model):
             } for q in cls.query.all()]
 
     @classmethod
-    def get_by_id(cls, id):
-        quote = cls.query.filter_by(id=id).first_or_404()
-        return quote.to_json()
-
-    @classmethod
-    def get_by_order(cls, order):
-        quote = cls.query.filter_by(order=order).first_or_404()
-        return quote.to_json()
-
-    @classmethod
-    def delete(cls, id):
-        quote = cls.query.filter_by(id=id).first_or_404()
-        order = quote.order
-        quotes = [
-            r for r in cls.query.all()
-            if r.id != id and r.order > order
-        ]
-        for r in quotes:
-            r.order -= 1
-        db.session.delete(quote)
-        db.session.add_all(quotes)
-        db.session.commit()
-
-    @classmethod
     def update_by_id(cls, id, data):
         quote = cls.query.filter_by(id=id).first_or_404()
 
-        # could do this more programatically, but prefer the explicit approach for now
         quote.text = data['text']
         quote.author = data['author']
         quote.published = data['published']
@@ -139,39 +181,11 @@ class Quote(db.Model):
         db.session.add(quote)
         db.session.commit()
 
-        # remember, this needs to return the object
+        # this needs to return the object
         return quote.to_json()
 
-    @classmethod
-    def update_batch(cls, data):
-        edited_quotes = list()
-        for d in data:
-            quote = cls.query.filter_by(id=d['id']).first_or_404()
-            quote.order = d['order']
-            edited_quotes.append(quote)
 
-        db.session.add_all(edited_quotes)
-        db.session.commit()
-
-    @classmethod
-    def new(cls):
-        quote = cls()
-        db.session.add(quote)
-        db.session.commit()
-
-    @classmethod
-    def new_by_order(cls, order_id):
-        order = int(order_id)
-        cur_quotes = cls.query.all()
-        for q in cur_quotes:
-            if q.order >= order:
-                q.order += 1
-        new_quote = cls(order=order)
-        db.session.add_all([*cur_quotes, new_quote])
-        db.session.commit()
-
-
-class Post(db.Model):
+class Post(APIMixin, db.Model):
     __tablename__ = 'posts'
     id = db.Column(db.Integer, primary_key=True)
     author_id = db.Column(db.Integer, db.ForeignKey(User.id))
@@ -215,20 +229,20 @@ class Post(db.Model):
     @classmethod
     def get_all(cls):
         return [
-                {
-                    'author': f'{p.user.first_name} {p.user.last_name}',
-                    'title': p.title,
-                    'pub_date': p.pub_date,
-                    'text': get_preview_text(' '.join(
-                        [c.payload for c in p.contents if c.content_type == 'p']
-                    ), max_char_count=200),
-                    'id': p.id
-                }
-                for p in cls.query \
-                    .filter_by(published=True) \
-                    .order_by(cls.date_created.desc()) \
-                    .all()
-            ]
+            {
+                'author': f'{p.user.first_name} {p.user.last_name}',
+                'title': p.title,
+                'pub_date': p.pub_date,
+                'text': get_preview_text(' '.join(
+                    [c.payload for c in p.contents if c.content_type == 'p']
+                ), max_char_count=200),
+                'id': p.id
+            }
+            for p in cls.query \
+                .filter_by(published=True) \
+                .order_by(cls.date_created.desc()) \
+                .all()
+        ]
 
     @classmethod
     def get_all_published_posts(cls):
@@ -266,7 +280,7 @@ class Post(db.Model):
         )
 
     @classmethod
-    def get_by_id(cls, id):
+    def get_by_id_public(cls, id):
         post = cls.query.filter_by(id=id).first_or_404()
         if not post.published:
             abort(404)
@@ -317,30 +331,9 @@ class Post(db.Model):
             } for d in cls.query.all()]
 
     @classmethod
-    # note that this function is named differently to avoid a clash with the frontend api
-    def get_by_id_private(cls, id):
-        post = cls.query.filter_by(id=id).first_or_404()
-        return post.to_json()
-
-    @classmethod
-    def delete(cls, id):
-        post = cls.query.filter_by(id=id).first_or_404()
-        order = post.order
-        posts = [
-            r for r in cls.query.all()
-            if r.id != id and r.order > order
-        ]
-        for r in posts:
-            r.order -= 1
-        db.session.delete(post)
-        db.session.add_all(posts)
-        db.session.commit()
-
-    @classmethod
     def update_by_id(cls, id, data):
         post = cls.query.filter_by(id=id).first_or_404()
 
-        # could do this more programatically, but prefer the explicit approach for now
         post.title = data['title']
         post.sub_title = data['sub_title']
         post.published = data['published']
@@ -353,19 +346,8 @@ class Post(db.Model):
     
         # remember, this view needs to return the saved item
         return post.to_json()
-        
-    @classmethod
-    def update_batch(cls, data):
-        # just used to update order
-        edited_posts = list()
-        for d in data:
-            post = cls.query.filter_by(id=d['id']).first_or_404()
-            post.order = d['order']
-            edited_posts.append(post)
 
-        db.session.add_all(edited_posts)
-        db.session.commit()
-
+    # new and new_by_order need to override APIMixin because of user_id
     @classmethod
     def new(cls, user_id):
         order = len(cls.query.all())
@@ -394,7 +376,6 @@ class PostContents(db.Model):
     payload = db.Column(db.Text, default='')
     uri = db.Column(db.String(128))
     css = db.Column(db.String(128))
-    # not sure a published column is necessary after all
     published = db.Column(db.Boolean, default=False)
 
     def to_json(self):
@@ -466,7 +447,7 @@ class PostContents(db.Model):
         return p
 
 
-class Node(db.Model):
+class Node(APIMixin, db.Model):
     """
     params:
         title: string, max-length 32, required
@@ -583,8 +564,6 @@ class Node(db.Model):
             'antonyms': [(n, node_dict.get(n, None)) for n in node.antonyms]
         }
 
-
-
     # create text property so api is consistent
     @property
     def text(self):
@@ -630,31 +609,9 @@ class Node(db.Model):
             } for d in cls.query.all()]
 
     @classmethod
-    def get_by_id(cls, id):
-        node = cls.query \
-            .filter_by(id=id) \
-            .first_or_404()
-        return node.to_json()
-
-    @classmethod
-    def delete(cls, id):
-        node = cls.query.filter_by(id=id).first_or_404()
-        order = node.order
-        nodes = [
-            r for r in cls.query.all()
-            if r.id != id and r.order > order
-        ]
-        for r in nodes:
-            r.order -= 1
-        db.session.delete(node)
-        db.session.add_all(nodes)
-        db.session.commit()
-
-    @classmethod
     def update_by_id(cls, id, data):
         node = cls.query.filter_by(id=id).first_or_404()
 
-        # could do this more programatically, but prefer the explicit approach for now
         node.title = data['title']
         node.text = data['text']
         node.published = data['published']
@@ -667,43 +624,14 @@ class Node(db.Model):
     
         # remember, this view needs to return the saved item
         return node.to_json()
-        
 
-    @classmethod
-    def update_batch(cls, data):
-        edited_nodes = list()
-        for d in data:
-            node = cls.query.filter_by(id=d['id']).first_or_404()
-            node.order = d['order']
-            edited_nodes.append(node)
-
-        db.session.add_all(edited_nodes)
-        db.session.commit()
-
-    @classmethod
-    def new(cls):
-        order = len(cls.query.all())
-        node = cls(order=order)
-        db.session.add(node)
-        db.session.commit()
-
-    @classmethod
-    def new_by_order(cls, order_id):
-        order = int(order_id)
-        cur_nodes = cls.query.all()
-        for r in cur_nodes:
-            if r.order >= order:
-                r.order += 1
-        new_node = cls(order=order)
-        db.session.add_all([*cur_nodes, new_node])
-        db.session.commit()
 
     @classmethod
     def get_all_words(cls):
         return [w.title for w in cls.query.all()]
 
 
-class Video(db.Model):
+class Video(APIMixin, db.Model):
     __tablename__ = 'videos'
     id = db.Column(db.Integer, primary_key=True)
     order = db.Column(db.Integer)
@@ -753,29 +681,9 @@ class Video(db.Model):
             } for v in cls.query.all()]
 
     @classmethod
-    def get_by_id(cls, id):
-        video = cls.query.filter_by(id=id).first_or_404()
-        return video.to_json()
-
-    @classmethod
-    def delete(cls, id):
-        video = cls.query.filter_by(id=id).first_or_404()
-        order = video.order
-        videos = [
-            r for r in cls.query.all()
-            if r.id != id and r.order > order
-        ]
-        for r in videos:
-            r.order -= 1
-        db.session.delete(video)
-        db.session.add_all(videos)
-        db.session.commit()
-
-    @classmethod
     def update_by_id(cls, id, data):
         video = cls.query.filter_by(id=id).first_or_404()
 
-        # could do this more programatically, but prefer the explicit approach for now
         video.title = data['title']
         video.text = data['text']
         video.url = data['uri']
@@ -786,41 +694,9 @@ class Video(db.Model):
     
         # remember, this view needs to return the saved item
         return video.to_json()
-        
-
-    @classmethod
-    def update_batch(cls, data):
-        # just used to update order
-        edited_videos = list()
-        for d in data:
-            video = cls.query.filter_by(id=d['id']).first_or_404()
-            video.order = d['order']
-            edited_videos.append(video)
-
-        db.session.add_all(edited_videos)
-        db.session.commit()
-
-    @classmethod
-    def new(cls):
-        order = len(cls.query.all())
-        video = cls(order=order)
-        db.session.add(video)
-        db.session.commit()
 
 
-    @classmethod
-    def new_by_order(cls, order_id):
-        order = int(order_id)
-        cur_videos = cls.query.all()
-        for r in cur_videos:
-            if r.order >= order:
-                r.order += 1
-        new_video = cls(order=order)
-        db.session.add_all([*cur_videos, new_video])
-        db.session.commit()
-
-
-class Resource(db.Model):
+class Resource(APIMixin, db.Model):
     __tablename__ = 'resources'
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(128), default='')
@@ -872,29 +748,9 @@ class Resource(db.Model):
             } for r in cls.query.all()]
 
     @classmethod
-    def get_by_id(cls, id):
-        resource = cls.query.filter_by(id=id).first_or_404()
-        return resource.to_json()
-
-    @classmethod
-    def delete(cls, id):
-        resource = cls.query.filter_by(id=id).first_or_404()
-        order = resource.order
-        resources = [
-            r for r in cls.query.all()
-            if r.id != id and r.order > order
-        ]
-        for r in resources:
-            r.order -= 1
-        db.session.delete(resource)
-        db.session.add_all(resources)
-        db.session.commit()
-
-    @classmethod
     def update_by_id(cls, id, data):
         resource = cls.query.filter_by(id=id).first_or_404()
 
-        # could do this more programatically, but prefer the explicit approach for now
         resource.title = data['title']
         resource.text = data['text']
         resource.order = data['order']
@@ -907,34 +763,3 @@ class Resource(db.Model):
 
         # remember, this view needs to return the saved item
         return resource.to_json()
-
-
-    @classmethod
-    def update_batch(cls, data):
-        # just used to update order
-        edited_resources = list()
-        for d in data:
-            resource = cls.query.filter_by(id=d['id']).first_or_404()
-            resource.order = d['order']
-            edited_resources.append(resource)
-
-        db.session.add_all(edited_resources)
-        db.session.commit()
-
-    @classmethod
-    def new(cls):
-        order = len(cls.query.all())
-        resource = cls(order=order)
-        db.session.add(resource)
-        db.session.commit()
-
-    @classmethod
-    def new_by_order(cls, order_id):
-        order = int(order_id)
-        cur_resources = cls.query.all()
-        for r in cur_resources:
-            if r.order >= order:
-                r.order += 1
-        new_resource = cls(order=order)
-        db.session.add_all([*cur_resources, new_resource])
-        db.session.commit()

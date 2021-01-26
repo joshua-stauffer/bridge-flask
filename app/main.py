@@ -44,7 +44,7 @@ def blog(post_id):
     if post_id == '0':
         response = Post.get_most_recent()
     else:
-        response = Post.get_by_id(post_id)
+        response = Post.get_by_id_public(post_id)
 
     return render_template(
             'blog.html', 
